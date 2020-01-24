@@ -1460,7 +1460,7 @@ class EmployeeContract(models.Model):
     @api.multi
     def write(self, vals):
         result = super(EmployeeContract, self).write(vals)
-        self.send_notification_message()
+#         self.send_notification_message()
         return result
     
 #     @api.depends('trial_date_end_bool')
