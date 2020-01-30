@@ -982,9 +982,11 @@ class VendorRequest(models.Model):
             self.env['res.partner'].create(vals)
         else:
             self.customer_registration = True
+            self.customer = True
             if self.potential_partner_id:
                 self.potential_partner_id.customer_registration = True
                 self.potential_partner_id.potential_customer = False
+                self.potential_partner_id.customer = True
                 self.potential_partner_id.name = self.name
                 self.potential_partner_id.customer_registration = self.customer_registration
                 self.potential_partner_id.company_type = self.company_type
@@ -1009,7 +1011,7 @@ class VendorRequest(models.Model):
                 self.potential_partner_id.phone = self.phone
                 self.potential_partner_id.mobile = self.mobile
                 self.potential_partner_id.email = self.contact_email
-                self.potential_partner_id.customer = self.customer
+                #self.potential_partner_id.customer = self.customer
                 self.potential_partner_id.supplier = self.supplier
                 self.potential_partner_id.company_id = self.company_id
                 self.potential_partner_id.completed_customer_information = self.completed_customer_information
@@ -1460,23 +1462,23 @@ class EmployeeContract(models.Model):
     @api.multi
     def write(self, vals):
         result = super(EmployeeContract, self).write(vals)
-        self.send_notification_message()
+#         self.send_notification_message()
         return result
     
-    @api.depends('trial_date_end_bool')
-    def send_notification_message(self):
-        if self.trial_date_end_bool == True:
-            group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
-            user_ids = []
-            partner_ids = []
-            for user in group_id.users:
-                user_ids.append(user.id)
-                partner_ids.append(user.partner_id.id)
-            self.message_subscribe(partner_ids=partner_ids)
-            subject = "Probation period for {}'s contract had been updated and is Hence {}".format(self.name, self.trial_date_end)
-            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-            self.trial_date_end_bool = False
-            return False
+#     @api.depends('trial_date_end_bool')
+#     def send_notification_message(self):
+#         if self.trial_date_end_bool == True:
+#             group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
+#             user_ids = []
+#             partner_ids = []
+#             for user in group_id.users:
+#                 user_ids.append(user.id)
+#                 partner_ids.append(user.partner_id.id)
+#             self.message_subscribe(partner_ids=partner_ids)
+#             subject = "Probation period for {}'s contract had been updated and is Hence {}".format(self.name, self.trial_date_end)
+#             self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+#             self.trial_date_end_bool = False
+#             return False
     
     enabled_for_pension = fields.Boolean(string="Enabled for Pension")
     enabled_for_nhf = fields.Boolean(string="Enabled for NHF")

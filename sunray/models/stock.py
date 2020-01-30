@@ -115,12 +115,13 @@ class Partner(models.Model):
             partner_ids.append(partner.id)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     '''
-    
+    '''
     @api.onchange('customer')
     def _onchange_customer(self):
         if self.customer == True:
             self.potential_customer = True
-    
+            self.customer = False
+    '''
     @api.multi
     def _site_code_count(self):
         oe_checklist = self.env['site.code']
@@ -149,7 +150,7 @@ class Partner(models.Model):
     @api.multi
     def name_get(self):
         res = []
- 
+  
         for partner in self:
             result = partner.name
             if partner.parent_account_number:
