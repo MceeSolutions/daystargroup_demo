@@ -982,9 +982,11 @@ class VendorRequest(models.Model):
             self.env['res.partner'].create(vals)
         else:
             self.customer_registration = True
+            self.customer = True
             if self.potential_partner_id:
                 self.potential_partner_id.customer_registration = True
                 self.potential_partner_id.potential_customer = False
+                self.potential_partner_id.customer = True
                 self.potential_partner_id.name = self.name
                 self.potential_partner_id.customer_registration = self.customer_registration
                 self.potential_partner_id.company_type = self.company_type
@@ -1009,7 +1011,7 @@ class VendorRequest(models.Model):
                 self.potential_partner_id.phone = self.phone
                 self.potential_partner_id.mobile = self.mobile
                 self.potential_partner_id.email = self.contact_email
-                self.potential_partner_id.customer = self.customer
+                #self.potential_partner_id.customer = self.customer
                 self.potential_partner_id.supplier = self.supplier
                 self.potential_partner_id.company_id = self.company_id
                 self.potential_partner_id.completed_customer_information = self.completed_customer_information

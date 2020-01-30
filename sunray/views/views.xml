@@ -97,6 +97,9 @@
                 <!-- <button name="create_project" string="Create Project" type="object" class="btn-primary"/> -->
                 <button name="button_request_site_code" string="Request Site Code" type="object" attrs="{'invisible': [('request_site_code', '=', True)]}"/>
             </xpath>
+            <xpath expr="//button[@name='action_set_won_rainbowman']" position="replace">
+            	<button name="action_set_won_rainbowman" string="Mark Won" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('active','=',False), ('probability', '=', 100)]}" confirmation="are you sure this lead has been won?"/>
+            </xpath>
             <xpath expr="//button[@name='action_set_won_rainbowman']" position="after">
                 <button name="%(CustomerRequest_action_window)d" type='action' string='Customer Request'/>
                 <!--<button name="send_site_audit_request_mail" string="Send Site Audit Request" type="object" class="btn-primary" confirm="You are about to send site audit request"/>
@@ -108,18 +111,74 @@
 			    <field name="company_id" invisible="1"/>
 			</xpath>
 			<field name="tag_ids" position="after">
-				<field name="size" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
+				<field name="size" />
 	    		<!-- <field name="type_of_offer" attrs="{'invisible': [('company_id', '!=', 5)]}"/> -->
-	    		<field name="site_code_id" domain="[('partner_id','=', partner_id)]" widget="selection" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
+	    		<field name="site_code_id" domain="[('partner_id','=', partner_id)]" widget="selection" />
 	    		<!-- <field name="site_code_ids" widget="many2many_tags" domain="[('partner_id','=', partner_id)]"/>  -->
 	    		<!-- <field name="budget"/> -->	    		
+			  	<field name="contract_duration" />
+			  	<field name="coordinates" />
+			  	<field name="type_of_offer" />
+			  	<field name="tariff_per_kwp" />
+			  	<field name="solar_capacity" />
+			  	<field name="total_capacity" />
+			  	<!-- <field name="currency_id" attrs="{'invisible': [('company_id', '!=', 5)]}"/> 
+	    		<field name="nord_type_of_sales" attrs="{'invisible': [('company_id', '!=', 1)]}"/>
+	    		<field name="nord_type_of_offer" attrs="{'invisible': [('company_id', '!=', 1)]}"/>
+	    		<field name="nord_size" attrs="{'invisible': [('company_id', '!=', 1)]}"/> -->
+			</field>
+			<field name="name" position="before">
+				<field name="legal_review" invisible="1"/>
+				<field name="legal_review_done" invisible="1"/>
+				<field name="request_site_code" invisible="1"/>
+			</field>
+			<field name="team_id" position="after">
+				  	<field name="client_type" />
+				  	<field name="site_area" />
+				  	<field name="site_address" />
+				  	<field name="site_type" />
+				  	<field name="site_location_id" />
+				  	<field name="region" />
+				  	<field name="country_id" />
+				  	<field name="monthly_service_fees" />
+			  		<field name="sales_price" />
+			  		<field name="opportunity_created_date"/>
+			</field>
+	    </field>
+	</record>
+	
+	<!--<record id="pipeline_sunray_form" model="ir.ui.view">
+	    <field name="name">pipeline.sunray.form</field>
+	    <field name="model">crm.lead</field>
+	    <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+	    <field name="arch" type="xml">
+	    	<xpath expr="//button[@name='action_set_won_rainbowman']" position="before">
+                <button name="create_project" string="Create Project" type="object" class="btn-primary"/> 
+                <button name="button_request_site_code" string="Request Site Code" type="object" attrs="{'invisible': [('request_site_code', '=', True)]}"/>
+            </xpath>
+            <xpath expr="//button[@name='action_set_won_rainbowman']" position="after">
+                <button name="%(CustomerRequest_action_window)d" type='action' string='Customer Request'/>
+                <button name="send_site_audit_request_mail" string="Send Site Audit Request" type="object" class="btn-primary" confirm="You are about to send site audit request"/>
+                <button name="create_manufacturing_order" string="Create System Design" type="object" class="btn-primary"/>
+                <button name="button_submit_legal" string="request legal review" type="object" attrs="{'invisible': [('legal_review', '=', True)]}"/>
+            	<button name="button_submit_legal_done" string="legal review done" type="object" attrs="{'invisible': ['|', ('legal_review', '!=', True), ('legal_review_done', '=', True)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='date_deadline']" position="after">
+			    <field name="company_id" invisible="1"/>
+			</xpath>
+			<field name="tag_ids" position="after">
+				<field name="size" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
+	    		<field name="type_of_offer" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
+	    		<field name="site_code_id" domain="[('partner_id','=', partner_id)]" widget="selection" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
+	    		<field name="site_code_ids" widget="many2many_tags" domain="[('partner_id','=', partner_id)]"/>  
+	    		<field name="budget"/>		
 			  	<field name="contract_duration" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
 			  	<field name="coordinates" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
 			  	<field name="type_of_offer" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
 			  	<field name="tariff_per_kwp" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
 			  	<field name="solar_capacity" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
 			  	<field name="total_capacity" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
-			  	<!-- <field name="currency_id" attrs="{'invisible': [('company_id', '!=', 5)]}"/>  -->
+			  	<field name="currency_id" attrs="{'invisible': [('company_id', '!=', 5)]}"/> 
 	    		<field name="nord_type_of_sales" attrs="{'invisible': [('company_id', '!=', 1)]}"/>
 	    		<field name="nord_type_of_offer" attrs="{'invisible': [('company_id', '!=', 1)]}"/>
 	    		<field name="nord_size" attrs="{'invisible': [('company_id', '!=', 1)]}"/>
@@ -141,7 +200,7 @@
 			  		<field name="sales_price" attrs="{'invisible': [('company_id', '!=', 5)]}"/>
 			  		<field name="opportunity_created_date"/>
 			</field>
-			<!-- <xpath expr="//notebook" position="inside">
+			 <xpath expr="//notebook" position="inside">
 					<page string="Additional Information">
 						<group col="4" colspan="2">
 						  	<field name="client_type"/>
@@ -160,9 +219,9 @@
 						  	<field name="sales_price"/>
 						</group>
 					</page>
-				</xpath> -->
+				</xpath> 
 	    </field>
-	</record>
+	</record>-->
 	
 	<record id="sunray_hr_contract_view_form" model="ir.ui.view">
 	    <field name="name">sunray.hr.contract.form</field>
