@@ -1398,7 +1398,7 @@ class SiteCode(models.Model):
     display_name = fields.Char(string="display_name", store=True)
     num = fields.Integer(string="Num", store=True)
     
-    _sql_constraints = [('name_uniq', 'UNIQUE(name)', 'Site Code must be Unique')]
+    #_sql_constraints = [('name_uniq', 'UNIQUE(name)', 'Site Code must be Unique')]
     
     @api.model
     def create(self, vals):
