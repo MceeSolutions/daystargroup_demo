@@ -98,7 +98,7 @@
                 <button name="button_request_site_code" string="Request Site Code" type="object" attrs="{'invisible': [('request_site_code', '=', True)]}"/>
             </xpath>
             <xpath expr="//button[@name='action_set_won_rainbowman']" position="replace">
-            	<button name="action_set_won_rainbowman" string="Mark Won" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('active','=',False), ('probability', '=', 100)]}" confirmation="are you sure this lead has been won?"/>
+            	<button name="action_set_won_rainbowman" string="Mark Won" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('active','=',False), ('probability', '=', 100)]}" confirm="are you sure this lead has been won?"/>
             </xpath>
             <xpath expr="//button[@name='action_set_won_rainbowman']" position="after">
                 <button name="%(CustomerRequest_action_window)d" type='action' string='Customer Request'/>

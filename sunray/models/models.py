@@ -127,7 +127,13 @@ class Lead(models.Model):
                      'sales_price': self.sales_price
                 })
             return {}
-            
+    
+    @api.multi
+    def action_set_won_rainbowman(self):
+        self.ensure_one()
+        self.action_set_won()
+        self.create_project_from_lead()
+    
     @api.multi
     def button_reset(self):
         self.write({'state': 'draft'})
