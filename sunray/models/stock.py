@@ -106,7 +106,7 @@ class Partner(models.Model):
     
     customer_type_id = fields.Many2one(comodel_name='customer.type', string='Customer Type')
     
-    #_sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
+    _sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
     
     '''
     @api.onchange('name')
