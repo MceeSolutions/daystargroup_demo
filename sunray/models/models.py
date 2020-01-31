@@ -105,28 +105,28 @@ class Lead(models.Model):
         self.opportunity_created_date = self.create_date
     '''
             
-    @api.onchange('stage_id')
+    @api.multi
     def create_project_from_lead(self):
-        if self.stage_id.id == 29:
-            project_line = self.env['project.project'].sudo().create({
-                     'name': self.site_code_id.name,
-                     'partner_id': self.partner_id.id,
-                     'crm_lead_id': self.id,
-                     'site_code_id': self.site_code_id.id,
-                     'site_area': self.site_area,
-                     'site_address': self.site_address,
-                     'site_type': self.site_type,
-                     'country_id': self.country_id.id,
-                     'lease_duration': self.contract_duration,
-                     'coordinates': self.coordinates,
-                     'type_of_offer': self.type_of_offer,
-                     'tariff_per_kwp': self.tariff_per_kwp,
-                     'site_location_id': self.site_location_id.id,
-                     'total_capacity': self.total_capacity,
-                     'solar_capacity': self.solar_capacity,
-                     'sales_price': self.sales_price
-                })
-            return {}
+        #if self.stage_id.id == 29:
+        project_line = self.env['project.project'].create({
+                 'crm_lead_id': self.id,
+                 'name': self.site_code_id.name,
+                 'partner_id': self.partner_id.id,
+                 'site_code_id': self.site_code_id.id,
+                 'site_area': self.site_area,
+                 'site_address': self.site_address,
+                 'site_type': self.site_type,
+                 'country_id': self.country_id.id,
+                 'lease_duration': self.contract_duration,
+                 'coordinates': self.coordinates,
+                 'type_of_offer': self.type_of_offer,
+                 'tariff_per_kwp': self.tariff_per_kwp,
+                 'site_location_id': self.site_location_id.id,
+                 'total_capacity': self.total_capacity,
+                 'solar_capacity': self.solar_capacity,
+                 'sales_price': self.sales_price
+            })
+        return {}
     
     @api.multi
     def action_set_won_rainbowman(self):
