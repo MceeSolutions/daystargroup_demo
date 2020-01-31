@@ -106,6 +106,8 @@ class Partner(models.Model):
     
     customer_type_id = fields.Many2one(comodel_name='customer.type', string='Customer Type')
     
+    _sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
+    
     '''
     @api.onchange('name')
     def _onchange_name(self):
@@ -115,12 +117,13 @@ class Partner(models.Model):
             partner_ids.append(partner.id)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     '''
-    
+    '''
     @api.onchange('customer')
     def _onchange_customer(self):
         if self.customer == True:
             self.potential_customer = True
-    
+            self.customer = False
+    '''
     @api.multi
     def _site_code_count(self):
         oe_checklist = self.env['site.code']
@@ -889,12 +892,13 @@ class PurchaseRequisition(models.Model):
     def button_submit_purchase_agreement(self):
         self.submitted = True
         self.write({'state':'submit'})
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
-        user_ids = []
+        #group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
+        #user_ids = []
         partner_ids = []
-        for user in group_id.users:
-            user_ids.append(user.id)
-            partner_ids.append(user.partner_id.id)
+        partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
+        #for user in group_id.users:
+        #    user_ids.append(user.id)
+        #    partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "Purchase Agreement '{}' needs approval".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
@@ -1393,7 +1397,9 @@ class SiteCode(models.Model):
     stored_display_name = fields.Char(string="stored_display_name")
     display_name = fields.Char(string="display_name", store=True)
     num = fields.Integer(string="Num", store=True)
-
+    
+    _sql_constraints = [('name_uniq', 'UNIQUE(name)', 'Site Code must be Unique')]
+    
     @api.model
     def create(self, vals):
         site = self.env['res.country.state'].search([('id','=',vals['state_id'])])
