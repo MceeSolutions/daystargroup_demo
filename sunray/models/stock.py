@@ -106,7 +106,7 @@ class Partner(models.Model):
     
     customer_type_id = fields.Many2one(comodel_name='customer.type', string='Customer Type')
     
-    _sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
+    #_sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
     
     '''
     @api.onchange('name')
@@ -1397,8 +1397,6 @@ class SiteCode(models.Model):
     stored_display_name = fields.Char(string="stored_display_name")
     display_name = fields.Char(string="display_name", store=True)
     num = fields.Integer(string="Num", store=True)
-    
-    #_sql_constraints = [('name_uniq', 'UNIQUE(name)', 'Site Code must be Unique')]
     
     @api.model
     def create(self, vals):
