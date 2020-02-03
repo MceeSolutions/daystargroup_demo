@@ -102,6 +102,10 @@ class Partner(models.Model):
     
     potential_customer = fields.Boolean(string='Potential Customer', default=False)
     
+    employee = fields.Boolean(string='Employee')
+    
+    daystar_companies = fields.Boolean(string='Daystar Companies')
+    
     stored_display_name = fields.Char(string="stored_display_name")
     
     customer_type_id = fields.Many2one(comodel_name='customer.type', string='Customer Type')
@@ -1506,7 +1510,7 @@ class Project(models.Model):
     
     project_code_id = fields.Many2one(comodel_name='res.partner', string='Project Code', help="Client sub account code")
     
-    site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', domain=[('country_id.name','=','Nigeria')])
+    site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', related='site_code_id.state_id', domain=[('country_id.name','=','Nigeria')])
     #site_location_id = fields.Char(string='Site Location')
     
     site_code_id = fields.Many2one(comodel_name='site.code', string='Site Code')
@@ -1515,7 +1519,7 @@ class Project(models.Model):
     default_site_code = fields.Char(string='old Site Code') 
     
     client_type = fields.Many2one(comodel_name='customer.type', related='partner_id.customer_type_id', string='Customer Type')
-    site_area = fields.Char(string='Site Area')
+    site_area = fields.Char(string='Site Area', related='site_code_id.site_area')
     site_address = fields.Char(string='Site Address')
     site_type = fields.Char(string='Site Type')
     region = fields.Char(string='Region', related='site_location_id.region')

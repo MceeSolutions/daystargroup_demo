@@ -111,7 +111,7 @@
 			    <field name="company_id" invisible="1"/>
 			</xpath>
 			<field name="tag_ids" position="after">
-				<field name="size" />
+				<!-- <field name="size" />-->
 	    		<!-- <field name="type_of_offer" attrs="{'invisible': [('company_id', '!=', 5)]}"/> -->
 	    		<field name="site_code_id" domain="[('partner_id','=', partner_id)]" widget="selection" />
 	    		<!-- <field name="site_code_ids" widget="many2many_tags" domain="[('partner_id','=', partner_id)]"/>  -->
