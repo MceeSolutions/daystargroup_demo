@@ -46,7 +46,7 @@ class Lead(models.Model):
     #default_site_code = fields.Char(string='Site Code')
     
     client_type = fields.Many2one(comodel_name='customer.type', related='partner_id.customer_type_id', string='Customer Type')
-    site_area = fields.Char(string='Site Area')
+    site_area = fields.Char(string='Site Area', related='site_code_id.site_area')
     site_address = fields.Char(string='Site Address')
     site_type = fields.Char(string='Site Type')
     #site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site location', track_visibility='onchange')
@@ -68,7 +68,7 @@ class Lead(models.Model):
     sales_price = fields.Float(string="Sale Revenue")
     
     lead_approval = fields.Boolean(string="lead approval", related='company_id.company_lead_approval')
-    site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', domain=[('country_id.name','=','Nigeria')])
+    site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', related='site_code_id.state_id', domain=[('country_id.name','=','Nigeria')])
     
     request_site_code = fields.Boolean(string="Request Site Code")
     

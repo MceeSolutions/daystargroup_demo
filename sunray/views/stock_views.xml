@@ -1308,7 +1308,7 @@
 						  	<field name="client_site_visit"/>
 						  	<field name="internal_external_monthly"/>
 						  	<field name="client_type"/>
-						  	<field name="site_area"/>
+						  	<!-- <field name="site_area"/>-->
 						  	<field name="site_address"/>
 						  	<field name="site_type"/>
 						  	<field name="region"/>
