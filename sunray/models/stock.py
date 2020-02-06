@@ -110,7 +110,7 @@ class Partner(models.Model):
     
     customer_type_id = fields.Many2one(comodel_name='customer.type', string='Customer Type')
     
-    _sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
+    #_sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
     
     '''
     @api.onchange('name')
@@ -1542,7 +1542,7 @@ class Project(models.Model):
     monthly_service_fees = fields.Float(string='Monthly Service fees')
     lease_duration = fields.Char(string='If lease, contract duration')
     sales_price = fields.Float(string="Sale Revenue")
-    site_area = fields.Char(string='Site Area')
+    site_area = fields.Char(string='Site Area', related='site_code_id.site_area')
     
     #@api.model
     #def create(self, vals):

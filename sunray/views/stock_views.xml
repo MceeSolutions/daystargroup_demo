@@ -798,7 +798,7 @@
 		    		<!-- <field name="client_code" readonly="0"/> -->
 				</field>
 				<field name="customer" position="after">
-		    		<field name="potential_customer"/>
+		    		<field name="potential_customer" invisible="1"/>
 				</field>
 				<xpath expr="//notebook" position="inside">
 					<page string="Vendor Checklist" name="extra" attrs="{'invisible': [('supplier', '!=', True)]}">
