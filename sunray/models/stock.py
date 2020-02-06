@@ -1542,7 +1542,7 @@ class Project(models.Model):
     monthly_service_fees = fields.Float(string='Monthly Service fees')
     lease_duration = fields.Char(string='If lease, contract duration')
     sales_price = fields.Float(string="Sale Revenue")
-    site_area = fields.Char(string='Site Area')
+    site_area = fields.Char(string='Site Area', related='site_code_id.site_area')
     
     #@api.model
     #def create(self, vals):
