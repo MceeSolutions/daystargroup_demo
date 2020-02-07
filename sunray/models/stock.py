@@ -112,6 +112,26 @@ class Partner(models.Model):
     
     #_sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
     
+    
+    ''' 
+    @api.multi
+    def _check_customer_code(self):
+        customer_code = self.env['res.partner'].search([('parent_account_number', '=', self.parent_account_number)], limit=1)
+        if customer_code.parent_account_number == self.parent_account_number:
+            raise UserError(_('Customer Code Already Exists'))
+    
+      
+    @api.model
+    def create(self, vals):
+        #if vals.get('name', 'New') == 'New':
+         #   vals['name'] = self.env['ir.sequence'].next_by_code('availability.request') or '/'
+        customer_code = self.env['res.partner'].search([('parent_account_number', '=', self.parent_account_number)], limit=1)
+        if customer_code.parent_account_number == vals['parent_account_number']:
+            #raise ValidationError(_('Customer Code Already Exists'))
+            print('customer code,', customer_code)
+        return super(Partner, self).create(vals)
+    '''
+        
     '''
     @api.onchange('name')
     def _onchange_name(self):
