@@ -1207,7 +1207,7 @@
 	        		<!-- <button name="create_purchase_agreement" class="btn-primary" string="Create Purchase Agreement" type="object"/>-->
 	        		<!-- <button name="create_store_request" class="btn-primary" string="Create Store Request" type="object"/>  -->
 	        		<!-- <button name="create_manufacturing_order" class="btn-primary" string="Create Manufacturing Order" type="object"/> -->
-	            	<field name="state" widget="statusbar" statusbar_visible="kick_off,project_plan,supply_chain_project_execution,qc_sign_off,customer_sign_off,close_out" clickable="1"/>
+	            	<field name="state" widget="statusbar" statusbar_visible="kick_off,project_plan,supply_chain_project_execution,qc_sign_off,customer_sign_off,close_out,installed,decommissioned" clickable="1"/>
 	            </xpath>
 	        	<xpath expr="//button[@name='toggle_active']" position="before">
 		        	<button class="oe_stat_button" type="object" name="open_project_checklist" icon="fa-list">
@@ -1313,7 +1313,7 @@
 						  	<field name="site_type"/>
 						  	<field name="region"/>
 						  	<field name="country_id"/>
-						  	<field name="project_status"/>
+						  	<!-- <field name="project_status"/>-->
 						  	<field name="commissioning_date"/>
 						  	<field name="coordinates"/>
 						  	<field name="type_of_offer"/>
