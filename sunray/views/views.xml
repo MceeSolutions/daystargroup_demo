@@ -94,9 +94,9 @@
     	<record id="site_code_request_action" model="ir.actions.act_window">
             <field name="name">Site Code Request</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">site.code.request</field>
+            <field name="res_model">site.code.requested</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="site_code_request_view_form"/>
+            <field name="view_id" ref="site_code_requested_view_form"/>
             <field name="target">new</field>
         </record>
     
