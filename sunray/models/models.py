@@ -86,6 +86,8 @@ class Lead(models.Model):
     
     private_lead = fields.Boolean(string="private lead")
     
+    site_code_request_id = fields.Many2one('site.code.request', string='Request Site Code', index=True, track_visibility='onchange')
+    
     '''
     @api.multi
     def generate_site_code(self, vals):
@@ -149,7 +151,7 @@ class Lead(models.Model):
             user_ids.append(user.id)
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
-        subject = "A site code is needed for this '{}' oppurtunity".format(self.name)
+        subject = "A site code is needed for this '{}' oppurtunity for customer '{}', Site Location '{}' and Site Area '{}' ".format(self.name, self.site_code_request_id.partner_id.name, self.site_code_request_id.state_id.name, self.site_code_request_id.area)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return False
         return {}
@@ -320,6 +322,29 @@ class Lead(models.Model):
         }
         
         return res
+
+class SiteCodeRequest(models.Model):
+    _name = "site.code.request"
+    _description = 'Site Code Request'
+
+    state_id = fields.Many2one(comodel_name='res.country.state', string='Site location (State)', required=True, track_visibility='onchange')
+    partner_id = fields.Many2one(comodel_name='res.partner', string='Customer', required=True)
+    area = fields.Char(string="Site Area", required=True)
+    active = fields.Boolean('Active', default=True)
+    
+    
+class SiteCodeRequested(models.TransientModel):
+    _name = 'site.code.requested'
+    _description = 'Get Request Information'
+
+    site_code_request_id = fields.Many2one('site.code.request', 'site code request')
+
+    @api.multi
+    def action_request_information_apply(self):
+        leads = self.env['crm.lead'].browse(self.env.context.get('active_ids'))
+        leads.write({'site_code_request_id': self.site_code_request_id.id})
+        leads.button_request_site_code()
+        #return leads.button_reset()
 
 class Stage(models.Model):
     _name = "crm.stage"
