@@ -75,7 +75,6 @@
             </field>
         </record>
         
-        
         <record id="site_code_requested_view_form" model="ir.ui.view">
             <field name="name">site.code.requested.form</field>
             <field name="model">site.code.requested</field>
@@ -91,7 +90,7 @@
                 </form>
             </field>
         </record>
-        
+    
     	<record id="site_code_request_action" model="ir.actions.act_window">
             <field name="name">Site Code Request</field>
             <field name="type">ir.actions.act_window</field>
