@@ -57,6 +57,49 @@
       <field name="view_mode">tree,form</field>
     </record>
     
+    <!--
+            site code request views
+        -->
+        
+        <record id="site_code_request_view_form" model="ir.ui.view">
+            <field name="name">site.code.request.form</field>
+            <field name="model">site.code.request</field>
+            <field name="arch" type="xml">
+                <form string="Channel">
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="state_id"/>
+                        <field name="area"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record id="site_code_requested_view_form" model="ir.ui.view">
+            <field name="name">site.code.requested.form</field>
+            <field name="model">site.code.requested</field>
+            <field name="arch" type="xml">
+                <form string="Site Code Request">
+                    <group class="oe_title">
+                        <field name="site_code_request_id" required="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_request_information_apply" string="Send Request" type="object" class="btn btn-sm btn-primary"/>
+                        <button string="Cancel" class="btn btn-sm btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    
+    	<record id="site_code_request_action" model="ir.actions.act_window">
+            <field name="name">Site Code Request</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">site.code.requested</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="site_code_requested_view_form"/>
+            <field name="target">new</field>
+        </record>
+    
     <record model="ir.ui.view" id="new_contact_request_tree_view">
         <field name="name">new.contact.request.tree</field>
         <field name="model">new.contact.request</field>
@@ -96,6 +139,7 @@
 	    	<xpath expr="//button[@name='action_set_won_rainbowman']" position="before">
                 <!-- <button name="create_project" string="Create Project" type="object" class="btn-primary"/> -->
                 <button name="button_request_site_code" string="Request Site Code" type="object" attrs="{'invisible': [('request_site_code', '=', True)]}"/>
+            	<button name="%(sunray.site_code_request_action)d" string="Request Site Code" type="action" attrs="{'invisible': [('request_site_code', '=', True)]}"/>
             </xpath>
             <xpath expr="//button[@name='action_set_won_rainbowman']" position="replace">
             	<button name="action_set_won_rainbowman" string="Mark Won" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('active','=',False), ('probability', '=', 100)]}" confirm="are you sure this lead has been won?"/>
