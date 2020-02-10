@@ -326,11 +326,22 @@ class Lead(models.Model):
 class SiteCodeRequest(models.Model):
     _name = "site.code.request"
     _description = 'Site Code Request'
-
+    
+    @api.multi
+    def name_get(self):
+        res = []
+        for site in self:
+            result = site.name
+            if not site.name:
+                result = str(site.state_id.name) + " " + "-" + " " + str(site.partner_id.name) + " - " + str(site.area)
+            res.append((site.id, result))
+        return res
+    
+    name = fields.Char('name')
     state_id = fields.Many2one(comodel_name='res.country.state', string='Site location (State)', required=True, track_visibility='onchange')
     partner_id = fields.Many2one(comodel_name='res.partner', string='Customer', required=True)
     area = fields.Char(string="Site Area", required=True)
-    active = fields.Boolean('Active', default=True)
+    active = fields.Boolean('Active', default=False)
     
     
 class SiteCodeRequested(models.TransientModel):
