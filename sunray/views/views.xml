@@ -81,7 +81,7 @@
             <field name="arch" type="xml">
                 <form string="Site Code Request">
                     <group class="oe_title">
-                        <field name="site_code_request_id"/>
+                        <field name="site_code_request_id" required="1"/>
                     </group>
                     <footer>
                         <button name="action_request_information_apply" string="Send Request" type="object" class="btn btn-sm btn-primary"/>

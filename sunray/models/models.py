@@ -70,7 +70,7 @@ class Lead(models.Model):
     lead_approval = fields.Boolean(string="lead approval", related='company_id.company_lead_approval')
     site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', related='site_code_id.state_id', domain=[('country_id.name','=','Nigeria')])
     
-    request_site_code = fields.Boolean(string="Request Site Code")
+    request_site_code = fields.Boolean(string="Request Site Code", copy=False)
     
     site_code_id = fields.Many2one(comodel_name="site.code", string="Site Code")
     #site_code_ids = fields.Many2many(comodel_name="site.code", string="Site Code(s)")
