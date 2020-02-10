@@ -144,7 +144,7 @@ class Lead(models.Model):
     @api.multi
     def button_request_site_code(self):
         self.request_site_code = True
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_ict')
+        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_site_code_creation')
         user_ids = []
         partner_ids = []
         for user in group_id.users:
