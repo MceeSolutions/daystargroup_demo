@@ -70,7 +70,7 @@ class Lead(models.Model):
     lead_approval = fields.Boolean(string="lead approval", related='company_id.company_lead_approval')
     site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', related='site_code_id.state_id', domain=[('country_id.name','=','Nigeria')])
     
-    request_site_code = fields.Boolean(string="Request Site Code")
+    request_site_code = fields.Boolean(string="Request Site Code", copy=False)
     
     site_code_id = fields.Many2one(comodel_name="site.code", string="Site Code")
     #site_code_ids = fields.Many2many(comodel_name="site.code", string="Site Code(s)")
@@ -85,6 +85,8 @@ class Lead(models.Model):
     nord_size = fields.Char(string='Size.')
     
     private_lead = fields.Boolean(string="private lead")
+    
+    site_code_request_id = fields.Many2one('site.code.request', string='Request Site Code', index=True, track_visibility='onchange')
     
     '''
     @api.multi
@@ -142,14 +144,14 @@ class Lead(models.Model):
     @api.multi
     def button_request_site_code(self):
         self.request_site_code = True
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_ict')
+        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_site_code_creation')
         user_ids = []
         partner_ids = []
         for user in group_id.users:
             user_ids.append(user.id)
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
-        subject = "A site code is needed for this '{}' oppurtunity".format(self.name)
+        subject = "A site code is needed for this '{}' oppurtunity for customer '{}', Site Location '{}' and Site Area '{}' ".format(self.name, self.site_code_request_id.partner_id.name, self.site_code_request_id.state_id.name, self.site_code_request_id.area)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return False
         return {}
@@ -320,6 +322,40 @@ class Lead(models.Model):
         }
         
         return res
+
+class SiteCodeRequest(models.Model):
+    _name = "site.code.request"
+    _description = 'Site Code Request'
+    
+    @api.multi
+    def name_get(self):
+        res = []
+        for site in self:
+            result = site.name
+            if not site.name:
+                result = str(site.state_id.name) + " " + "-" + " " + str(site.partner_id.name) + " - " + str(site.area)
+            res.append((site.id, result))
+        return res
+    
+    name = fields.Char('name')
+    state_id = fields.Many2one(comodel_name='res.country.state', string='Site location (State)', required=True, track_visibility='onchange')
+    partner_id = fields.Many2one(comodel_name='res.partner', string='Customer', required=True)
+    area = fields.Char(string="Site Area", required=True)
+    active = fields.Boolean('Active', default=False)
+    
+    
+class SiteCodeRequested(models.TransientModel):
+    _name = 'site.code.requested'
+    _description = 'Get Request Information'
+
+    site_code_request_id = fields.Many2one('site.code.request', 'site code request')
+
+    @api.multi
+    def action_request_information_apply(self):
+        leads = self.env['crm.lead'].browse(self.env.context.get('active_ids'))
+        leads.write({'site_code_request_id': self.site_code_request_id.id})
+        leads.button_request_site_code()
+        #return leads.button_reset()
 
 class Stage(models.Model):
     _name = "crm.stage"
@@ -496,7 +532,29 @@ class HelpdeskTicket(models.Model):
     _description = 'Ticket'
     
     project_id = fields.Many2one(comodel_name='project.project', string='Project')
-    project_site_code = fields.Char(string='Site Code', related='project_id.default_site_code', store = True)
+    project_site_code_id = fields.Many2one(comodel_name='site.code', string='Site Code', related='project_id.site_code_id', store = True)
+    
+    stage_name = fields.Char(string='Stage Name', related='stage_id.name', store = True)
+    
+    @api.onchange('stage_id')
+    def _check_security_action_validate(self):
+        #current_employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        if self.stage_id.name == 'Solved':
+            if not self.env.user.has_group('sunray.group_noc_team'):
+                raise UserError(_('Only members of the Noc Team are allowed to close tickets.'))
+    
+    @api.multi
+    def button_request_closure(self):
+        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_noc_team')
+        user_ids = []
+        partner_ids = []
+        for user in group_id.users:
+            user_ids.append(user.id)
+            partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "This Ticket '{}' is ready for closure".format(self.display_name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        return {}
     
 class ItemType(models.Model):
     _name = "item.type"

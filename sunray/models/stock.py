@@ -37,7 +37,7 @@ class ResConfigSettings(models.TransientModel):
     
     lead_approval = fields.Boolean(string='Lead Approval', company_dependent=False, readonly=False, related='company_id.company_lead_approval')
     
-class Partner(models.Model):
+class Partners(models.Model):
     _name = 'res.partner'
     _inherit = 'res.partner'
     
@@ -100,7 +100,11 @@ class Partner(models.Model):
     tax_no = fields.Char(string="Tax No.")
     legal = fields.Char(string="Other, Please specify:")
     
-    potential_customer = fields.Boolean(string='Potential Customer', default=False)
+    customer = fields.Boolean(string='Is a Customer', default=False,
+                               help="Check this box if this contact is a customer. It can be selected in sales orders.")
+    
+    potential_customer = fields.Boolean(string='Potential Customer', default=False,
+                                        help="Check this box if this contact is a potential customer. It can be selected in sales orders.")
     
     employee = fields.Boolean(string='Employee')
     
@@ -112,6 +116,26 @@ class Partner(models.Model):
     
     #_sql_constraints = [('section_parent_account_number', 'UNIQUE(parent_account_number)', 'Customer Code must be Unique')]
     
+    
+    ''' 
+    @api.multi
+    def _check_customer_code(self):
+        customer_code = self.env['res.partner'].search([('parent_account_number', '=', self.parent_account_number)], limit=1)
+        if customer_code.parent_account_number == self.parent_account_number:
+            raise UserError(_('Customer Code Already Exists'))
+    
+      
+    @api.model
+    def create(self, vals):
+        #if vals.get('name', 'New') == 'New':
+         #   vals['name'] = self.env['ir.sequence'].next_by_code('availability.request') or '/'
+        customer_code = self.env['res.partner'].search([('parent_account_number', '=', self.parent_account_number)], limit=1)
+        if customer_code.parent_account_number == vals['parent_account_number']:
+            #raise ValidationError(_('Customer Code Already Exists'))
+            print('customer code,', customer_code)
+        return super(Partner, self).create(vals)
+    '''
+        
     '''
     @api.onchange('name')
     def _onchange_name(self):
@@ -151,6 +175,36 @@ class Partner(models.Model):
         elif 'supplier' in vals and vals['supplier'] == True and vals['parent_id'] == False:
                 vals['ref'] = self.env['ir.sequence'].next_by_code('res.partner.vendor') or '/'        
         return super(Partner, self).create(vals)
+    '''
+    
+    @api.multi
+    def _check_customer_code(self, vals):
+        customer = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
+        if vals['parent_account_number'] == False:
+            print('proceed')
+        else:
+            if customer:
+                raise UserError(_('Customer Code Must Unique!'))
+    
+    @api.multi
+    def _check_potential_customer(self, vals):
+        if vals['potential_customer'] == True:
+            if not self.user_has_groups('sales_team.group_sale_salesman'):
+                raise UserError(_("Only Members of the BD/Sales team can create Potential Customer(s)"))
+            else:
+                print('nothing')
+    
+    @api.model
+    def create(self, vals):
+        self._check_customer_code(vals)
+        self._check_potential_customer(vals)
+        return super(Partners, self).create(vals)
+    
+    '''
+    @api.multi
+    def write(self, vals):
+        self._check_customer_code(vals)
+        return super(Partner, self).write(vals)
     '''
     
     @api.multi
@@ -1402,8 +1456,15 @@ class SiteCode(models.Model):
     display_name = fields.Char(string="display_name", store=True)
     num = fields.Integer(string="Num", store=True)
     
+    @api.multi
+    def _check_site_code(self, vals):
+        site = self.env['site.code'].search([('name','=',vals['name'])])
+        if site:
+            raise UserError(_('Site Code Must Unique!'))
+    
     @api.model
     def create(self, vals):
+        self._check_site_code(vals)
         site = self.env['res.country.state'].search([('id','=',vals['state_id'])])
         client = self.env['res.partner'].search([('id','=',vals['partner_id'])])
         #existing_site = self.env['site.code'].search([('state_id','=',vals['state_id']), ('partner_id', '=',vals['partner_id'])], limit=1)
@@ -1424,6 +1485,11 @@ class SiteCode(models.Model):
 #         res_model, res_id = self.env['ir.model.data'].get_object_reference('stock','stock_location_locations_partner')
 #         product = self.env[res_model].browse(res_id) 
         return super(SiteCode, self).create(vals)
+    
+    @api.multi
+    def write(self, vals):
+        self._check_site_code(vals)
+        return super(SiteCode, self).write(vals)
     
     '''
     @api.multi

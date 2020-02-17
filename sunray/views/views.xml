@@ -57,6 +57,49 @@
       <field name="view_mode">tree,form</field>
     </record>
     
+    <!--
+            site code request views
+        -->
+        
+        <record id="site_code_request_view_form" model="ir.ui.view">
+            <field name="name">site.code.request.form</field>
+            <field name="model">site.code.request</field>
+            <field name="arch" type="xml">
+                <form string="Channel">
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="state_id"/>
+                        <field name="area"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record id="site_code_requested_view_form" model="ir.ui.view">
+            <field name="name">site.code.requested.form</field>
+            <field name="model">site.code.requested</field>
+            <field name="arch" type="xml">
+                <form string="Site Code Request">
+                    <group class="oe_title">
+                        <field name="site_code_request_id" required="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_request_information_apply" string="Send Request" type="object" class="btn btn-sm btn-primary"/>
+                        <button string="Cancel" class="btn btn-sm btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    
+    	<record id="site_code_request_action" model="ir.actions.act_window">
+            <field name="name">Site Code Request</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">site.code.requested</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="site_code_requested_view_form"/>
+            <field name="target">new</field>
+        </record>
+    
     <record model="ir.ui.view" id="new_contact_request_tree_view">
         <field name="name">new.contact.request.tree</field>
         <field name="model">new.contact.request</field>
@@ -94,8 +137,9 @@
 	    <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
 	    <field name="arch" type="xml">
 	    	<xpath expr="//button[@name='action_set_won_rainbowman']" position="before">
-                <!-- <button name="create_project" string="Create Project" type="object" class="btn-primary"/> -->
-                <button name="button_request_site_code" string="Request Site Code" type="object" attrs="{'invisible': [('request_site_code', '=', True)]}"/>
+                <!-- <button name="create_project" string="Create Project" type="object" class="btn-primary"/> 
+                <button name="button_request_site_code" string="Request Site Code" type="object" attrs="{'invisible': [('request_site_code', '=', True)]}"/>-->
+            	<button name="%(sunray.site_code_request_action)d" string="Request Site Code" type="action" attrs="{'invisible': [('request_site_code', '=', True)]}"/>
             </xpath>
             <xpath expr="//button[@name='action_set_won_rainbowman']" position="replace">
             	<button name="action_set_won_rainbowman" string="Mark Won" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('active','=',False), ('probability', '=', 100)]}" confirm="are you sure this lead has been won?"/>
@@ -104,8 +148,8 @@
                 <button name="%(CustomerRequest_action_window)d" type='action' string='Customer Request'/>
                 <!--<button name="send_site_audit_request_mail" string="Send Site Audit Request" type="object" class="btn-primary" confirm="You are about to send site audit request"/>
                 <button name="create_manufacturing_order" string="Create System Design" type="object" class="btn-primary"/>
-                --><button name="button_submit_legal" string="request legal review" type="object" attrs="{'invisible': [('legal_review', '=', True)]}"/>
-            	<button name="button_submit_legal_done" string="legal review done" type="object" attrs="{'invisible': ['|', ('legal_review', '!=', True), ('legal_review_done', '=', True)]}"/>
+                <button name="button_submit_legal" string="request legal review" type="object" attrs="{'invisible': [('legal_review', '=', True)]}"/>
+            	<button name="button_submit_legal_done" string="legal review done" type="object" attrs="{'invisible': ['|', ('legal_review', '!=', True), ('legal_review_done', '=', True)]}"/>-->
             </xpath>
             <xpath expr="//field[@name='date_deadline']" position="after">
 			    <field name="company_id" invisible="1"/>
@@ -328,9 +372,13 @@
 	    <field name="model">helpdesk.ticket</field>
 	    <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
 	    <field name="arch" type="xml">
+	    	<xpath expr="//button[@name='assign_ticket_to_self']" position="after">
+            	<button name="button_request_closure" string="Request Closure" attrs="{'invisible': [('stage_name', '=', 'Solved')]}" type="object" class="btn-primary" groups="helpdesk.group_helpdesk_user"/>
+            </xpath>
 			<field name="priority" position="before">
 				<field name="project_id"/>
-				<field name="project_site_code"/>
+				<field name="project_site_code_id" widget="selection"/>
+				<field name="stage_name" invisible="1"/>
 			</field>
 	    </field>
 	</record>
@@ -689,16 +737,16 @@
 	        <form string="Partners">
 	   	<header>
 	   		<button name="send_request_information" states="draft" string="Request Information" type="object" class="btn-primary"/>
-			<button name="button_submit" states="draft,pending_info" string="Request Registration" type="object" class="btn-primary"/>
+			<!-- <button name="button_submit" states="draft,pending_info" string="Request Registration" type="object" class="btn-primary"/>-->
 			
 			<button name="button_validate" string="Approve" type="object" groups="sunray.group_one_vendor_approval" attrs="{'invisible': ['|', ('customer', '=', True), ('state', '!=', 'approve')]}"/>
 			<button name="button_approve" string="Confirm" type="object" groups="sunray.group_two_vendor_approval" attrs="{'invisible': ['|', ('customer', '=', True), ('state', '!=', 'validate')]}"/>
 			<button name="button_approve" string="Confirm" type="object" groups="sunray.group_customer_approval" attrs="{'invisible': ['|', ('supplier', '=', True), ('state', '!=', 'validate')]}"/>
 			<button name="button_reject" states="approve,validate" string="Reject" type="object" groups="sunray.group_one_vendor_approval,sunray.group_one_vendor_approval,sunray.group_customer_approval"/>
 			<button name="button_reset" states="reset" string="Set to Draft" type="object" />
-			<button name="button_submit_legal" string="request legal review" type="object" attrs="{'invisible': [('legal_review', '=', True)]}"/>
-            <button name="button_submit_legal_done" string="legal review done" type="object" attrs="{'invisible': ['|', ('legal_review', '!=', True), ('legal_review_done', '=', True)]}"/>
-            <field name="state" widget="statusbar" statusbar_visible="draft,pending_info,approve,validate,registered" readonly="1"/>
+			<!-- <button name="button_submit_legal" string="request legal review" type="object" attrs="{'invisible': [('legal_review', '=', True)]}"/>
+            <button name="button_submit_legal_done" string="legal review done" type="object" attrs="{'invisible': ['|', ('legal_review', '!=', True), ('legal_review_done', '=', True)]}"/> -->
+            <field name="state" widget="statusbar" statusbar_visible="draft,pending_info,validate,registered" readonly="1"/>
 	    </header>
 	        <sheet>
 	        	<div class="oe_button_box" name="button_box">
