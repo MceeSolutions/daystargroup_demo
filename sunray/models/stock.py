@@ -174,6 +174,22 @@ class Partner(models.Model):
     '''
     
     @api.multi
+    def _check_customer_code(self, vals):
+        customer = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
+        if customer:
+            raise UserError(_('Customer Code Must Unique!'))
+    
+    @api.model
+    def create(self, vals):
+        self._check_customer_code(vals)
+        return super(Partner, self).create(vals)
+    
+    @api.multi
+    def write(self, vals):
+        self._check_customer_code(vals)
+        return super(Partner, self).write(vals)
+    
+    @api.multi
     def name_get(self):
         res = []
   
@@ -1422,8 +1438,15 @@ class SiteCode(models.Model):
     display_name = fields.Char(string="display_name", store=True)
     num = fields.Integer(string="Num", store=True)
     
+    @api.multi
+    def _check_site_code(self, vals):
+        site = self.env['site.code'].search([('name','=',vals['name'])])
+        if site:
+            raise UserError(_('Site Code Must Unique!'))
+    
     @api.model
     def create(self, vals):
+        self._check_site_code(vals)
         site = self.env['res.country.state'].search([('id','=',vals['state_id'])])
         client = self.env['res.partner'].search([('id','=',vals['partner_id'])])
         #existing_site = self.env['site.code'].search([('state_id','=',vals['state_id']), ('partner_id', '=',vals['partner_id'])], limit=1)
@@ -1444,6 +1467,11 @@ class SiteCode(models.Model):
 #         res_model, res_id = self.env['ir.model.data'].get_object_reference('stock','stock_location_locations_partner')
 #         product = self.env[res_model].browse(res_id) 
         return super(SiteCode, self).create(vals)
+    
+    @api.multi
+    def write(self, vals):
+        self._check_site_code(vals)
+        return super(SiteCode, self).write(vals)
     
     '''
     @api.multi
