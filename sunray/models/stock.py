@@ -201,10 +201,15 @@ class Partners(models.Model):
         return super(Partners, self).create(vals)
     
     '''
+=======
+        return super(Partner, self).create(vals)
+    
+>>>>>>> ce47406a21c8d6a08aaa79d6575c5b537eeb49da
     @api.multi
     def write(self, vals):
         self._check_customer_code(vals)
         return super(Partner, self).write(vals)
+<<<<<<< HEAD
     '''
     
     @api.multi
