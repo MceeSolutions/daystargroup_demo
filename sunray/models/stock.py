@@ -37,7 +37,7 @@ class ResConfigSettings(models.TransientModel):
     
     lead_approval = fields.Boolean(string='Lead Approval', company_dependent=False, readonly=False, related='company_id.company_lead_approval')
     
-class Partner(models.Model):
+class Partners(models.Model):
     _name = 'res.partner'
     _inherit = 'res.partner'
     
@@ -103,7 +103,8 @@ class Partner(models.Model):
     customer = fields.Boolean(string='Is a Customer', default=False,
                                help="Check this box if this contact is a customer. It can be selected in sales orders.")
     
-    potential_customer = fields.Boolean(string='Potential Customer', default=False)
+    potential_customer = fields.Boolean(string='Potential Customer', default=False,
+                                        help="Check this box if this contact is a potential customer. It can be selected in sales orders.")
     
     employee = fields.Boolean(string='Employee')
     
@@ -179,18 +180,32 @@ class Partner(models.Model):
     @api.multi
     def _check_customer_code(self, vals):
         customer = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
-        if customer:
-            raise UserError(_('Customer Code Must Unique!'))
+        if vals['parent_account_number'] == False:
+            print('proceed')
+        else:
+            if customer:
+                raise UserError(_('Customer Code Must Unique!'))
+    
+    @api.multi
+    def _check_potential_customer(self, vals):
+        if vals['potential_customer'] == True:
+            if not self.user_has_groups('sales_team.group_sale_salesman'):
+                raise UserError(_("Only Members of the BD/Sales team can create Potential Customer(s)"))
+            else:
+                print('nothing')
     
     @api.model
     def create(self, vals):
         self._check_customer_code(vals)
-        return super(Partner, self).create(vals)
+        self._check_potential_customer(vals)
+        return super(Partners, self).create(vals)
     
+    '''
     @api.multi
     def write(self, vals):
         self._check_customer_code(vals)
         return super(Partner, self).write(vals)
+    '''
     
     @api.multi
     def name_get(self):
