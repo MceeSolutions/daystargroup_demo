@@ -100,6 +100,9 @@ class Partner(models.Model):
     tax_no = fields.Char(string="Tax No.")
     legal = fields.Char(string="Other, Please specify:")
     
+    customer = fields.Boolean(string='Is a Customer', default=False,
+                               help="Check this box if this contact is a customer. It can be selected in sales orders.")
+    
     potential_customer = fields.Boolean(string='Potential Customer', default=False)
     
     employee = fields.Boolean(string='Employee')
