@@ -177,14 +177,14 @@ class Partners(models.Model):
         return super(Partner, self).create(vals)
     '''
     
-    @api.multi
-    def _check_customer_code(self, vals):
-        customer = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
-        if vals['parent_account_number'] == False:
-            print('proceed')
-        else:
-            if customer:
-                raise UserError(_('Customer Code Must Unique!'))
+#     @api.multi
+#     def _check_customer_code(self, vals):
+#         customer = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
+#         if vals['parent_account_number'] == False:
+#             print('proceed')
+#         else:
+#             if customer:
+#                 raise UserError(_('Customer Code Must Unique!'))
     
     @api.multi
     def _check_potential_customer(self, vals):
@@ -196,7 +196,7 @@ class Partners(models.Model):
     
     @api.model
     def create(self, vals):
-        self._check_customer_code(vals)
+#         self._check_customer_code(vals)
         self._check_potential_customer(vals)
         return super(Partners, self).create(vals)
     
