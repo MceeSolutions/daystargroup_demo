@@ -114,5 +114,10 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
     
+    <record id="group_potential_customer_creation" model="res.groups">
+        <field name="name">potential Customer Creation</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
 </data>
 </odoo>

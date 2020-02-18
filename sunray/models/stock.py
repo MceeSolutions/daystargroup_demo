@@ -189,7 +189,7 @@ class Partners(models.Model):
     @api.multi
     def _check_potential_customer(self, vals):
         if vals['potential_customer'] == True:
-            if not self.user_has_groups('sales_team.group_sale_salesman'):
+            if not self.user_has_groups('sunray.group_potential_customer_creation'):
                 raise UserError(_("Only Members of the BD/Sales team can create Potential Customer(s)"))
             else:
                 print('nothing')
