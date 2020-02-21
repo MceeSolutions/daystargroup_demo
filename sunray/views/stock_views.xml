@@ -62,10 +62,10 @@
             	<button name="button_submit_purchase_agreement" string="Submit To Manager" type="object" groups="base.group_user" attrs="{'invisible': ['|', ('submitted', '=', True), ('state', '!=', 'draft')]}"/>
             </xpath>
             <xpath expr="//button[@name='action_in_progress']" position="before">
-            	<button name="action_line_manager_approval" states="submit" string="Approve" type="object" class="btn-primary" groups="base.group_user"/>
+            	<button name="action_line_manager_approval" states="submit" string="Approve" type="object" class="btn-primary" groups="sunray.group_hr_line_manager"/>
             </xpath>
             <xpath expr="//button[@name='action_in_progress']" position="replace">
-            	<button name="action_in_progress" states="approve" string="Approve" type="object" class="btn-primary" groups="sunray.group_hr_line_manager"/>
+            	<button name="action_in_progress" states="approve" string="Approve" type="object" class="btn-primary" groups="sunray.group_below_1st_authorization"/>
             </xpath>
             <xpath expr="//field[@name='line_ids']" position="after">
 	            <group class="oe_subtotal_footer oe_right" colspan="2" name="total">
