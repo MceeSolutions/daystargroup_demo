@@ -177,14 +177,14 @@ class Partners(models.Model):
         return super(Partner, self).create(vals)
     '''
     
-    @api.multi
-    def _check_customer_code(self, vals):
-        customer = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
-        if vals['parent_account_number'] == False:
-            print('proceed')
-        else:
-            if customer:
-                raise UserError(_('Customer Code Must Unique!'))
+#     @api.multi
+#     def _check_customer_code(self, vals):
+#         customer = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
+#         if vals['parent_account_number'] == False:
+#             print('proceed')
+#         else:
+#             if customer:
+#                 raise UserError(_('Customer Code Must Unique!'))
     
     @api.multi
     def _check_potential_customer(self, vals):
@@ -196,7 +196,7 @@ class Partners(models.Model):
     
     @api.model
     def create(self, vals):
-        self._check_customer_code(vals)
+#         self._check_customer_code(vals)
         self._check_potential_customer(vals)
         return super(Partners, self).create(vals)
     
@@ -542,8 +542,10 @@ class PurchaseOrder(models.Model):
             raise UserError(_('Cant Confirm purchase order for an Unknown Vendor -- Request Vendor Registration.'))
     
     def _default_employee(self):
-        self.env['hr.employee'].search([('user_id','=',self.env.uid)])
-        return self.env['hr.employee'].search([('user_id','=',self.env.uid)])
+        if self.requisition_id:
+            return self.requisition_id.employee_id.id
+        else:
+            return self.env['hr.employee'].search([('user_id','=',self.env.uid)], limit=1)
     
     @api.multi
     def _check_override(self):
@@ -905,11 +907,11 @@ class PurchaseRequisition(models.Model):
     def _check_line_manager(self):
         current_employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
         if current_employee == self.employee_id:
-            raise UserError(_('You are not allowed to approve your own request.'))
+            return True
+#             raise UserError(_('You are not allowed to approve your own request.'))
     
     def _default_employee(self):
-        self.env['hr.employee'].search([('user_id','=',self.env.uid)])
-        return self.env['hr.employee'].search([('user_id','=',self.env.uid)])
+        return self.env['hr.employee'].search([('user_id','=',self.env.uid)], limit=1)
     
     @api.depends('state')
     def _set_state(self):
@@ -963,7 +965,7 @@ class PurchaseRequisition(models.Model):
         #    user_ids.append(user.id)
         #    partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
-        subject = "Purchase Agreement '{}' needs approval".format(self.name)
+        subject = "Procurement Request '{}' needs approval".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return False
     
@@ -974,11 +976,11 @@ class PurchaseRequisition(models.Model):
         #self.manager_confirm()
         self.line_manager_approval_date = date.today()
         self.line_manager_approval = self._uid
-        if self.total_cost < 18150000.00:
-            self.check_manager_approval_one()
-        else:
-            if self.total_cost > 18150000.00:
-                self.check_manager_approval_two()
+#         if self.total_cost < 18150000.00:
+        self.check_manager_approval_one()
+#         else:
+#             if self.total_cost > 18150000.00:
+#                 self.check_manager_approval_two()
     
     @api.multi
     def action_in_progress(self):
@@ -1016,7 +1018,7 @@ class PurchaseRequisition(models.Model):
                 user_ids.append(user.id)
                 partner_ids.append(user.partner_id.id)
             self.message_subscribe(partner_ids=partner_ids)
-            subject = "Purchase Agreement {} needs your approval, Below Quota".format(self.name)
+            subject = "Procurement Request {} needs your approval".format(self.name)
             self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
             return False
         else:
