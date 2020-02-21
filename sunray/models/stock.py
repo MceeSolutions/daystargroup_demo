@@ -2316,8 +2316,8 @@ class Picking(models.Model):
             self.receipt_validation_inventory()
         else:
             if self.user_has_groups('purchase.group_purchase_manager') and self.inventory_validation == True:
-                self.button_validate()
-        return res
+                return res
+        
     
     @api.multi
     def action_confirm(self):
