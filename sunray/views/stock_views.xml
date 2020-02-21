@@ -189,7 +189,8 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='analytic_tag_ids']" position="replace">
             	<field name="analytic_tag_ids" invisible = "1" widget="many2many_tags" options="{'color_field': 'color'}"/>
             </xpath>
-            <field name="partner_id" position="after">	
+            <field name="partner_id" position="after">
+            	<field name="parent_po"/>	
             	<field name="project_id"/>
             </field>
             <field name="order_line" position="after">

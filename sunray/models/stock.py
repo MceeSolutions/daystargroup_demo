@@ -591,7 +591,7 @@ class PurchaseOrder(models.Model):
     
     line_manager_approval_date = fields.Date(string='Line-Manager Approval Date', readonly=True, track_visibility='onchange')
     line_manager_approval = fields.Many2one('res.users','Line-Manager Approval Name', readonly=True, track_visibility='onchange')
-    
+    parent_po = fields.Many2one('purchase.order','Parent PO', track_visibility='onchange')
     client_id = fields.Many2one('res.partner','Client', track_visibility='onchange')
     
     project_id = fields.Many2one(comodel_name='project.project', string='Project')
@@ -2314,7 +2314,7 @@ class Picking(models.Model):
     @api.multi
     def button_validate(self):
         res = super(Picking, self).button_validate()
-        if self.user_has_groups('stock.group_stock_manager'):
+        if self.inventory_validation == False:
             self.receipt_validation_inventory()
         else:
             if self.user_has_groups('purchase.group_purchase_manager') and self.inventory_validation == True:
