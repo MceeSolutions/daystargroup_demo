@@ -2275,6 +2275,9 @@ class Picking(models.Model):
              " * Done: has been processed, can't be modified or cancelled anymore.\n"
              " * Cancelled: has been cancelled, can't be confirmed anymore.")
     
+    inventory_validation = fields.Boolean(string='inventory validation')
+    
+    
     @api.multi
     def button_submit(self):
         self.write({'state': 'submit'})
@@ -2289,6 +2292,32 @@ class Picking(models.Model):
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return False
         return {}
+    
+    @api.multi
+    def receipt_validation_inventory(self):
+        if self.picking_type_id.name == "Receipts":
+            self.inventory_validation = True
+            group_id = self.env['ir.model.data'].xmlid_to_object('purchase.group_purchase_manager')
+            user_ids = []
+            partner_ids = []
+            for user in group_id.users:
+                user_ids.append(user.id)
+                partner_ids.append(user.partner_id.id)
+            self.message_subscribe(partner_ids=partner_ids)
+            subject = "Stock Receipt {} has been validated by Inventory, awaiting Procurement validation".format(self.name)
+            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+            return False
+        return res
+    
+    @api.multi
+    def button_validate(self):
+        res = super(Picking, self).button_validate()
+        if self.user_has_groups('stock.group_stock_manager'):
+            self.receipt_validation_inventory()
+        else:
+            if self.user_has_groups('purchase.group_purchase_manager') and self.inventory_validation == True:
+                self.button_validate()
+        return res
     
     @api.multi
     def action_confirm(self):
