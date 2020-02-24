@@ -2317,7 +2317,7 @@ class Picking(models.Model):
         if self.picking_type_id.name == "Receipts" and self.inventory_validation == False:
             self.receipt_validation_inventory()
         else:
-            if self.user_has_groups('purchase.group_purchase_manager') and self.inventory_validation == True:
+            if self.user_has_groups('purchase.group_purchase_manager'):
                 return res
         
     
