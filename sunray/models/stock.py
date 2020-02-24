@@ -2309,12 +2309,12 @@ class Picking(models.Model):
             subject = "Stock Receipt {} has been validated by Inventory, awaiting Procurement validation".format(self.name)
             self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
             return False
-        return res
+        return True
     
     @api.multi
     def button_validate(self):
         res = super(Picking, self).button_validate()
-        if self.inventory_validation == False:
+        if self.picking_type_id.name == "Receipts" and self.inventory_validation == False:
             self.receipt_validation_inventory()
         else:
             if self.user_has_groups('purchase.group_purchase_manager') and self.inventory_validation == True:
