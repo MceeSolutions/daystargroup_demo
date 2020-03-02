@@ -15,7 +15,6 @@ WHITE_LIST = ['odooprojects']      # Look for these words in the file path.
 EXCLUSIONS = ['']          # Ignore <listcomp>, etc. in the function name.
 
 
-
 PURCHASE_REQUISITION_STATES = [
     ('draft', 'Draft'),
     ('submit', 'Submitted'),
@@ -188,7 +187,7 @@ class Partners(models.Model):
     
     @api.multi
     def _check_potential_customer(self, vals):
-        if vals['potential_customer'] == True:
+        if 'potential_customer' in vals and vals['potential_customer'] == True:
             if not self.user_has_groups('sunray.group_potential_customer_creation'):
                 raise UserError(_("Only Members of the BD/Sales team can create Potential Customer(s)"))
             else:
