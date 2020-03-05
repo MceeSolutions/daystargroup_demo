@@ -574,6 +574,13 @@ class PurchaseOrder(models.Model):
         else:
             self.need_approval = False
     
+    @api.multi
+    def _compute_amount_in_word(self):
+        for rec in self:
+            rec.num_word = str(rec.currency_id.amount_to_text(rec.amount_total)) + ' only'
+
+    num_word = fields.Char(string="Amount In Words:", compute='_compute_amount_in_word')
+    
     need_override = fields.Boolean ('Need Budget Override', compute= "_check_override", track_visibility="onchange", copy=False)
     
     employee_id = fields.Many2one('hr.employee', 'Employee',
