@@ -32,6 +32,8 @@
 	    	<!--  <field name="vendor_id" position="after">
 	    		<field name="employee_id"/>
 	    	</field>-->
+	    	<field name="ordering_date" position="replace"/>
+	    	<field name="schedule_date" position="replace"/>
 			<field name="line_ids" position="after">
     			<group string = "Requester" col="4" colspan="6">
 	            	<field name="employee_id" readonly="1" />
@@ -144,8 +146,8 @@
         		<button name="button_legal_reviewd" string="Review Done" type="object" attrs="{'invisible': ['|', '|', ('state', '=', 'purchase'), ('need_finance_review', '=', False), ('need_finance_review_done', '=', True)]}" groups="sunray.group_legal_team"/>
         	</xpath>
         	
-        	<xpath expr="//button[@name='button_confirm']" position="after">
-        		<button name="action_line_manager_approval" type="object" states="submit" string="Approve" id="draft_confirm" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>
+        	<xpath expr="//button[@name='button_cancel']" position="after">
+        		<button name="action_line_manager_approval" type="object" states="submit" string="Approve" id="draft_confirm" groups="sunray.group_hr_line_manager"/>
         	</xpath>
         	<xpath expr="//button[@name='button_cancel']" position="after">
         		<button name="button_cancel" type="object" states="submit" string="Decline" id="draft_decline" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>
@@ -189,8 +191,9 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='analytic_tag_ids']" position="replace">
             	<field name="analytic_tag_ids" invisible = "1" widget="many2many_tags" options="{'color_field': 'color'}"/>
             </xpath>
-            <field name="partner_id" position="after">	
-            	<field name="project_id"/>
+            <field name="partner_id" position="after">
+<!--             	<field name="parent_po"/>	
+            	<field name="project_id"/> -->
             </field>
             <field name="order_line" position="after">
            			<group string = "Requested By" col="4" colspan="6">

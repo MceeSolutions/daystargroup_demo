@@ -556,24 +556,52 @@ class HelpdeskTicket(models.Model):
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return {}
     
+    
+    
 class ItemType(models.Model):
+    
+    def find_missing(self,lst): 
+        return [x for x in range(lst[0], lst[-1]+2)  
+                               if x not in lst] 
+
+    
+    def _default_code(self):
+        code  = [int(a.code) for a in self.search([(1,'=',1)])]
+        if code ==[]:
+            return '001'
+        else:
+            return str(self.find_missing(code)[0]).zfill(3)
+ 
+    
     _name = "item.type"
     _description = "Item Types"
-    _order = "name"
+    _order = "code"
     _inherit = ['mail.thread']
 
     name = fields.Char('Name', required=True, track_visibility='onchange')
-    code = fields.Char('Code', required=True, track_visibility='onchange')
+    code = fields.Char('Code', required=True, default=_default_code, track_visibility='onchange')
     active = fields.Boolean('Active', default='True')
 
 class BrandType(models.Model):
+    
+    def find_missing(self,lst): 
+        return [x for x in range(lst[0], lst[-1]+2)  
+                           if x not in lst] 
+
+    
+    def _default_code(self):
+        code  = [int(a.code[1:]) for a in self.search([(1,'=',1)])]
+        if code ==[]:
+            return 'M0001'
+        else:
+            return 'M' + str(self.find_missing(code)[0]).zfill(4)
     _name = "brand.type"
-    _description = "Brand Types"
-    _order = "name"
+    _description = "Manufacturer"
+    _order = "code"
     _inherit = ['mail.thread']
 
     name = fields.Char('Name', required=True, track_visibility='onchange')
-    code = fields.Char('Code', required=True, track_visibility='onchange')
+    code = fields.Char('Code', required=True, default=_default_code, track_visibility='onchange')
     active = fields.Boolean('Active', default='True')
 
 class ProductTemplate(models.Model):
@@ -584,7 +612,7 @@ class ProductTemplate(models.Model):
     dimension = fields.Char(string='Dimension (mm) (W x D x H)')
     manufacturer_part_number = fields.Char(string='Manufacturer part number')
     
-    brand = fields.Many2one('brand.type', string='Brand', track_visibility='onchange', index=True)
+    brand = fields.Many2one('brand.type', string='Manufacturer', track_visibility='onchange', index=True)
     item_type = fields.Many2one('item.type', string='Item Type', track_visibility='onchange', index=True)
     
     '''
@@ -771,8 +799,7 @@ class VendorRequest(models.Model):
     
     
     def _default_employee(self): # this method is to search the hr.employee and return the user id of the person clicking the form atm
-        self.env['hr.employee'].search([('user_id','=',self.env.uid)])
-        return self.env['hr.employee'].search([('user_id','=',self.env.uid)])
+        return self.env['hr.employee'].search([('user_id','=',self.env.uid)], limit=1)
     
     
     @api.multi

@@ -15,7 +15,6 @@ WHITE_LIST = ['odooprojects']      # Look for these words in the file path.
 EXCLUSIONS = ['']          # Ignore <listcomp>, etc. in the function name.
 
 
-
 PURCHASE_REQUISITION_STATES = [
     ('draft', 'Draft'),
     ('submit', 'Submitted'),
@@ -188,7 +187,7 @@ class Partners(models.Model):
     
     @api.multi
     def _check_potential_customer(self, vals):
-        if vals['potential_customer'] == True:
+        if 'potential_customer' in vals and vals['potential_customer'] == True:
             if not self.user_has_groups('sunray.group_potential_customer_creation'):
                 raise UserError(_("Only Members of the BD/Sales team can create Potential Customer(s)"))
             else:
@@ -598,7 +597,7 @@ class PurchaseOrder(models.Model):
     
     line_manager_approval_date = fields.Date(string='Line-Manager Approval Date', readonly=True, track_visibility='onchange')
     line_manager_approval = fields.Many2one('res.users','Line-Manager Approval Name', readonly=True, track_visibility='onchange')
-    
+    parent_po = fields.Many2one('purchase.order','Parent PO', track_visibility='onchange')
     client_id = fields.Many2one('res.partner','Client', track_visibility='onchange')
     
     project_id = fields.Many2one(comodel_name='project.project', string='Project')
@@ -2316,15 +2315,15 @@ class Picking(models.Model):
             subject = "Stock Receipt {} has been validated by Inventory, awaiting Procurement validation".format(self.name)
             self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
             return False
-        return res
+        return True
     
     @api.multi
     def button_validate(self):
         res = super(Picking, self).button_validate()
-        if self.user_has_groups('stock.group_stock_manager'):
+        if self.picking_type_id.name == "Receipts" and self.inventory_validation == False:
             self.receipt_validation_inventory()
         else:
-            if self.user_has_groups('purchase.group_purchase_manager') and self.inventory_validation == True:
+            if self.user_has_groups('purchase.group_purchase_manager'):
                 return res
         
     
