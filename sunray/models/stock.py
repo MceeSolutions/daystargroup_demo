@@ -35,6 +35,15 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
     
     lead_approval = fields.Boolean(string='Lead Approval', company_dependent=False, readonly=False, related='company_id.company_lead_approval')
+
+class IrSequence(models.Model):
+    _inherit = 'ir.sequence'
+    
+    @api.multi
+    def _check_po_sequence(self):
+        po_code = self.env['ir.sequence'].search([('code', '=', 'purchase.order')], limit=1)
+        if po_code:
+            po_code.number_next_actual = 1
     
 class Partners(models.Model):
     _name = 'res.partner'
