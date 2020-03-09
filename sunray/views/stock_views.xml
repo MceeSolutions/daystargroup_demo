@@ -1401,18 +1401,18 @@
             </field>
     </record>
 	
-	<record model="ir.actions.act_window" id="store_req_action1_window">
+	<record model="ir.actions.act_window" id="store_req_action_window">
       <field name="name">Store Request</field>
       <field name="res_model">stock.picking</field>
       <field name="view_mode">tree,form</field>
-      <field name="context" eval='{"default_is_locked":False,"default_picking_type_id":ref("sunray.stock_picking_type_emp")}'/>
+      <field name="context" eval='{"default_is_locked":False,"default_picking_type_id":ref("stock.picking_type_out")}'/>
     </record>
      
    	 <record id="store_req_action_tree" model="ir.actions.act_window.view">
          <field eval="1" name="sequence"/>
          <field name="view_mode">tree</field>
          <field name="view_id" ref="stock.vpicktree"/>
-         <field name="act_window_id" ref="store_req_action1_window"/>
+         <field name="act_window_id" ref="store_req_action_window"/>
      </record>
 	
 	    <record id="sunray_stock_form_view" model="ir.ui.view">
@@ -1433,8 +1433,9 @@
                     <button name="action_line_manager_approval" attrs="{'invisible': [('state', '!=', 'submit')]}" string="Approve" type="object" class="oe_highlight" groups="sunray.group_hr_line_manager"/>
                     <button name="action_confirm" attrs="{'invisible': [('state', '!=', 'approve')]}" string="Validate &amp; Mark To Do" type="object" class="oe_highlight" groups="sunray.group_hr_line_manager"/>
                     <button name="action_assign" attrs="{'invisible': [('show_check_availability', '=', False)]}" string="Check Availability" type="object" class="oe_highlight" groups="base.group_user"/>
-                    <button name="button_validate" attrs="{'invisible': ['|',('show_validate', '=', False), ('need_approval', '=', True)]}" string="Validate" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
-                    <!-- <button name="button_approve_srt" attrs="{'invisible': [('need_approval', '=', False)]}" string="Approve" groups="stock.group_stock_user" type="object" class="oe_highlight"/>  -->
+                    <button name="button_validate" attrs="{'invisible': ['|',('show_validate', '=', False)]}" string="Validate" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+                    <!-- <button name="button_validate" attrs="{'invisible': ['|',('show_validate', '=', False), ('need_approval', '=', True)]}" string="Validate" groups="stock.group_stock_user" type="object" class="oe_highlight"/>
+                    <button name="button_approve_srt" attrs="{'invisible': [('need_approval', '=', False)]}" string="Approve" groups="stock.group_stock_user" type="object" class="oe_highlight"/>  -->
                     <button name="do_print_picking" string="Print" groups="stock.group_stock_user" type="object" attrs="{'invisible': ['|', ('state', 'not in', ('assigned', 'partially_available')), ('is_locked', '=', False)]}"/>
                     <button name="%(stock.action_report_delivery)d" string="Print" attrs="{'invisible': ['|', ('state', '!=', 'done'), ('is_locked', '=', False)]}" type="action" groups="base.group_user"/>
                     <button name="%(stock.act_stock_return_picking)d" string="Return" attrs="{'invisible': ['|', ('state', '!=', 'done'), ('is_locked', '=', False)]}" type="action" groups="base.group_user"/>
@@ -1467,8 +1468,9 @@
                             attrs="{'invisible': [('has_packages', '=', False)]}"/>
                         <button name="%(stock.action_stock_report)d" icon="fa-arrow-up" class="oe_stat_button" string="Up/Down Traceability" type="action" states="done" groups="stock.group_production_lot"/>
                     </div>
-		            	<field name= "need_approval" invisible = "1"/>
+		           	<!--<field name= "need_approval" invisible = "1"/>
 		            	<h3 attrs="{'invisible': [('need_approval', '=', False)]}"><b>Needs Management Approval, The Management. has been notified </b></h3>
+		            -->
 		            <h1 class="hidden-xs">
                         <field name="name" attrs="{'invisible': [('name','=','/')]}" readonly="1"/>
                     </h1>
@@ -1591,11 +1593,11 @@
          <field eval="2" name="sequence"/>
          <field name="view_mode">form</field>
          <field name="view_id" ref="sunray_stock_form_view"/>
-         <field name="act_window_id" ref="store_req_action1_window"/>
+         <field name="act_window_id" ref="store_req_action_window"/>
      </record>
 	
 	<menuitem name="Store Request" id="store_request" parent="stock.menu_stock_root"
-              action="store_req_action1_window"/>
+              action="store_req_action_window"/>
               
 	<menuitem name="Site Code" id="site_location_id" parent="crm.crm_menu_root"
               action="site_location_action_window" groups="sunray.group_ict"/>

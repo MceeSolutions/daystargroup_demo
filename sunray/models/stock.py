@@ -2292,16 +2292,18 @@ class Picking(models.Model):
     
     inventory_validation = fields.Boolean(string='inventory validation')
     
-    
     @api.multi
     def button_submit(self):
         self.write({'state': 'submit'})
         group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
         user_ids = []
         partner_ids = []
-        for user in group_id.users:
-            user_ids.append(user.id)
-            partner_ids.append(user.partner_id.id)
+        if self.employee_id.parent_id.user_id:
+            partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
+        else:
+            for user in group_id.users:
+                user_ids.append(user.id)
+                partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "Store request {} needs approval".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
@@ -2349,17 +2351,24 @@ class Picking(models.Model):
             subject = "Store request {} has been authorized".format(self.name)
             self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
             return False
+        else:
+            subject = "Request {} has been approved".format(self.name)
+            partner_ids = []
+            for partner in self.message_partner_ids:
+                partner_ids.append(partner.id)
+            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return res
     
     @api.multi
     def action_line_manager_approval(self):
         self.write({'state':'approve'})
         self.manager_confirm()
-        if self.total_cost < 18150000.00:
-            self.check_manager_approval_one()
-        else:
-            if self.total_cost > 18150000.00:
-                self.check_manager_approval_two()
+        self.action_confirm()
+        #if self.total_cost < 18150000.00:
+        #    self.check_manager_approval_one()
+        #else:
+        #    if self.total_cost > 18150000.00:
+        #        self.check_manager_approval_two()
         
     
     @api.multi
