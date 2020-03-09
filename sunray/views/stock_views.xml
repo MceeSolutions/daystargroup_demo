@@ -169,7 +169,11 @@
         	</xpath>
         	
         	<xpath expr="//button[@name='button_approve']" position="replace">
-        		<button name="button_approve" type="object" states='to approve,legal_reviewed' string="Confirm Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
+        		<button name="button_approve" type="object" states='management,legal_reviewed' string="Confirm Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
+        	</xpath>
+        	
+        	<xpath expr="//button[@name='button_approve']" position="after">
+        		<button name="action_procurement_approval" type="object" states='to approve' string="Approve Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
         	</xpath>
         	
         	<xpath expr="//button[@name='button_approve']" position="after">
@@ -205,13 +209,17 @@
 		            	<field name="line_manager_approval"/>
 		            	<field name="line_manager_approval_date"/>
 		        	</group>
+		        	<group string = "Procurement Approval" col="4" colspan="4">
+		            	<field name="po_manager_approval"/>
+		            	<field name="po_approval_date"/>
+		        	</group>
             		<group string = "First Authorization" col="4" colspan="4">
 		            	<field name="manager_approval"/>
 		            	<field name="approval_date"/>
 		        	</group>
 	            	<group string = "Second Authorization" col="4" colspan="4">
-		            	<field name="po_manager_approval"/>
-		            	<field name="po_approval_date"/>
+		            	<field name="second_manager_approval"/>
+		            	<field name="second_manager_approval_date"/>
 	            	</group>
             </field>
             <field name="company_id" position="after">
@@ -1405,7 +1413,7 @@
       <field name="name">Store Request</field>
       <field name="res_model">stock.picking</field>
       <field name="view_mode">tree,form</field>
-      <field name="context" eval='{"default_is_locked":False,"default_picking_type_id":ref("stock.picking_type_out")}'/>
+      <field name="context" eval='{"default_is_locked":False,"default_picking_type_id.code":"outgoing"}'/>
     </record>
      
    	 <record id="store_req_action_tree" model="ir.actions.act_window.view">
@@ -1482,7 +1490,8 @@
                         	<!-- <field name="man_confirm" readonly="1"/> -->
                             <field name="partner_id" attrs="{'invisible': [('picking_type_code', '=', 'internal')]}"/>
                             <field name="location_id" groups="stock.group_stock_user"  attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"/>
-                            <field name="location_dest_id" groups="stock.group_stock_user" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/>
+                            <!-- <field name="location_dest_id" groups="stock.group_stock_user" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/> -->
+                            <field name="location_dest_id" groups="stock.group_stock_user" invisible="1"/>
                             <field name="backorder_id" readonly="1" attrs="{'invisible': [('backorder_id','=',False)]}"/>
                             <field name="site_code_id" required="1"/>
                         </group>
