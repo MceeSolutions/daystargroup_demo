@@ -656,6 +656,26 @@ class PurchaseOrder(models.Model):
     def button_submit(self):
         self.write({'state': 'submit'})
         self.request_date = date.today()
+        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
+        user_ids = []
+        partner_ids = []
+        if self.employee_id.parent_id.user_id:
+            partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
+        else:
+            for user in group_id.users:
+                user_ids.append(user.id)
+                partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "RFQ '{}' needs approval".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        return False
+        return {}
+    
+    '''
+    @api.multi
+    def button_submit(self):
+        self.write({'state': 'submit'})
+        self.request_date = date.today()
         partner_ids = [self.employee_id.user_id.partner_id.id]
         manager_id = self.employee_id.parent_id.user_id.partner_id.id
         partner_ids.append(manager_id)
@@ -663,13 +683,15 @@ class PurchaseOrder(models.Model):
         subject = "RFQ '{}' needs approval".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=[manager_id])
         return False
-    
+    '''
+                    
     @api.multi
     def action_line_manager_approval(self):
         self.write({'state':'management'})
         #self.manager_confirm()
         self.line_manager_approval_date = date.today()
         self.line_manager_approval = self._uid
+        self
         if self.amount_total < 18150000.00:
             self.check_manager_approval_one()
         else:
