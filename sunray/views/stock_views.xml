@@ -1594,7 +1594,7 @@
          <field name="act_window_id" ref="store_req_action_window"/>
      </record>
 	
-	<menuitem name="Store Request" id="store_request" parent="stock.menu_stock_root"
+	<menuitem name="Store Request" id="store_requests" parent="stock.menu_stock_root"
               action="store_req_action_window"/>
               
 	<menuitem name="Site Code" id="site_location_id" parent="crm.crm_menu_root"
