@@ -600,6 +600,8 @@ class PurchaseOrder(models.Model):
     approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
     manager_position = fields.Char('Manager Position', readonly=True, track_visibility='onchange')
+    second_manager_approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
+    second_manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
     
     po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
     po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
@@ -687,20 +689,48 @@ class PurchaseOrder(models.Model):
                     
     @api.multi
     def action_line_manager_approval(self):
-        self.write({'state':'management'})
+        self.write({'state':'to approve'})
         #self.manager_confirm()
         self.line_manager_approval_date = date.today()
         self.line_manager_approval = self._uid
-        self
-        if self.amount_total < 18150000.00:
+        subject = "RFQ {} has been approved by Line Manager".format(self.name)
+        partner_ids = []
+        for partner in self.message_partner_ids:
+            partner_ids.append(partner.id)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.notify_procurement_for_approval()
+    
+    @api.multi
+    def action_procurement_approval(self):
+        self.write({'state':'management'})
+        self.po_approval_date = date.today()
+        self.po_manager_approval = self._uid
+        subject = "RFQ {} has been approved by Procurement".format(self.name)
+        partner_ids = []
+        for partner in self.message_partner_ids:
+            partner_ids.append(partner.id)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        if self.amount_total < 100000.00:
             self.check_manager_approval_one()
         else:
-            if self.amount_total > 18150000.00:
+            if self.amount_total > 100000.00:
                 self.check_manager_approval_two()
+    
+    @api.multi
+    def notify_procurement_for_approval(self):
+        group_id = self.env['ir.model.data'].xmlid_to_object('purchase.group_purchase_manager')
+        user_ids = []
+        partner_ids = []
+        for user in group_id.users:
+            user_ids.append(user.id)
+            partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "RFQ {} needs approval from procurement".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
     @api.depends('amount_total')
     def check_manager_approval_one(self):
-        if self.amount_total < 18150000.00:
+        if self.amount_total < 100000.00:
             self.need_management_approval = True
             group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_below_1st_authorization')
             user_ids = []
@@ -717,7 +747,7 @@ class PurchaseOrder(models.Model):
             
     @api.depends('amount_total')
     def check_manager_approval_two(self):
-        if self.amount_total > 18150000.00:
+        if self.amount_total > 100000.00:
             self.need_management_approval = True
             group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_above_1st_authorization')
             user_ids = []
@@ -821,8 +851,8 @@ class PurchaseOrder(models.Model):
         res = super(PurchaseOrder, self).button_approve()
         self._check_vendor_registration()
         self._check_line_manager()
-        self.po_approval_date = date.today()
-        self.po_manager_approval = self._uid
+        self.approval_date = date.today()
+        self.manager_approval = self._uid
         return res
     
     @api.multi
@@ -2386,12 +2416,24 @@ class Picking(models.Model):
         self.write({'state':'approve'})
         self.manager_confirm()
         self.action_confirm()
+        self.notify_store()
         #if self.total_cost < 18150000.00:
         #    self.check_manager_approval_one()
         #else:
         #    if self.total_cost > 18150000.00:
         #        self.check_manager_approval_two()
         
+    @api.multi
+    def notify_store(self):
+        group_id = self.env['ir.model.data'].xmlid_to_object('stock.group_stock_manager')
+        user_ids = []
+        partner_ids = []
+        for user in group_id.users:
+            user_ids.append(user.id)
+            partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "Request {} has been approved".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
     @api.multi
     def manager_confirm(self):
@@ -2405,6 +2447,10 @@ class Picking(models.Model):
     def _default_employee(self):
         self.env['hr.employee'].search([('user_id','=',self.env.uid)])
         return self.env['hr.employee'].search([('user_id','=',self.env.uid)])
+    
+    @api.onchange('site_code_id')
+    def _onchange_site_id(self):
+        self.location_dest_id = self.site_code_id.location_id
     
     owner_id = fields.Many2one('res.partner', 'Owner',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, default=_default_owner,
