@@ -2351,6 +2351,12 @@ class Picking(models.Model):
             subject = "Store request {} has been authorized".format(self.name)
             self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
             return False
+        else:
+            subject = "Request {} has been approved".format(self.name)
+            partner_ids = []
+            for partner in self.message_partner_ids:
+                partner_ids.append(partner.id)
+            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return res
     
     @api.multi
