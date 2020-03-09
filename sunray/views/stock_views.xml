@@ -1401,7 +1401,7 @@
             </field>
     </record>
 	
-	<record model="ir.actions.act_window" id="store_req_action1_window">
+	<record model="ir.actions.act_window" id="store_req_action_window">
       <field name="name">Store Request</field>
       <field name="res_model">stock.picking</field>
       <field name="view_mode">tree,form</field>
@@ -1412,7 +1412,7 @@
          <field eval="1" name="sequence"/>
          <field name="view_mode">tree</field>
          <field name="view_id" ref="stock.vpicktree"/>
-         <field name="act_window_id" ref="store_req_action1_window"/>
+         <field name="act_window_id" ref="store_req_action_window"/>
      </record>
 	
 	    <record id="sunray_stock_form_view" model="ir.ui.view">
@@ -1591,11 +1591,11 @@
          <field eval="2" name="sequence"/>
          <field name="view_mode">form</field>
          <field name="view_id" ref="sunray_stock_form_view"/>
-         <field name="act_window_id" ref="store_req_action1_window"/>
+         <field name="act_window_id" ref="store_req_action_window"/>
      </record>
 	
 	<menuitem name="Store Request" id="store_request" parent="stock.menu_stock_root"
-              action="store_req_action1_window"/>
+              action="store_req_action_window"/>
               
 	<menuitem name="Site Code" id="site_location_id" parent="crm.crm_menu_root"
               action="site_location_action_window" groups="sunray.group_ict"/>
