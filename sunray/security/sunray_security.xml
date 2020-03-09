@@ -119,5 +119,10 @@
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
     
+    <record id="group_chairman" model="res.groups">
+        <field name="name">Chairman</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
 </data>
 </odoo>
