@@ -546,8 +546,9 @@ class PurchaseOrder(models.Model):
         
     @api.multi
     def _check_vendor_registration(self):
-        if self.partner_id.vendor_registration == False:
-            raise UserError(_('Cant Confirm purchase order for an Unknown Vendor -- Request Vendor Registration.'))
+        return True
+#         if self.partner_id.vendor_registration == False:
+#             raise UserError(_('Cant Confirm purchase order for an Unknown Vendor -- Request Vendor Registration.'))
     
     def _default_employee(self):
         if self.requisition_id:
@@ -655,15 +656,12 @@ class PurchaseOrder(models.Model):
     def button_submit(self):
         self.write({'state': 'submit'})
         self.request_date = date.today()
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
-        user_ids = []
-        partner_ids = []
-        for user in group_id.users:
-            user_ids.append(user.id)
-            partner_ids.append(user.partner_id.id)
+        partner_ids = [self.employee_id.user_id.partner_id.id]
+        manager_id = self.employee_id.parent_id.user_id.partner_id.id
+        partner_ids.append(manager_id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "RFQ '{}' needs approval".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.message_post(subject=subject,body=subject,partner_ids=[manager_id])
         return False
     
     @api.multi
