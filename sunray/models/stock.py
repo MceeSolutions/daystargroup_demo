@@ -2357,11 +2357,12 @@ class Picking(models.Model):
     def action_line_manager_approval(self):
         self.write({'state':'approve'})
         self.manager_confirm()
-        if self.total_cost < 18150000.00:
-            self.check_manager_approval_one()
-        else:
-            if self.total_cost > 18150000.00:
-                self.check_manager_approval_two()
+        self.action_confirm()
+        #if self.total_cost < 18150000.00:
+        #    self.check_manager_approval_one()
+        #else:
+        #    if self.total_cost > 18150000.00:
+        #        self.check_manager_approval_two()
         
     
     @api.multi
