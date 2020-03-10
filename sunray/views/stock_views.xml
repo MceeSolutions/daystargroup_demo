@@ -208,7 +208,7 @@
             </field>
             <field name="order_line" position="after">
            			<group string = "Requested By" col="4" colspan="6">
-		            	<field name="employee_id" groups="sunray.group_hr_line_manager"/>
+		            	<field name="employee_id" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager" required="1"/>
 		            	<field name="department_name" invisible="0"/>
 		            	<field name="request_date"/>
 		        	</group>
