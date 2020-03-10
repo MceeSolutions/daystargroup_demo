@@ -2483,8 +2483,8 @@ class Picking(models.Model):
     
     @api.onchange('site_code_id')
     def _onchange_site_id(self):
-        self.location_dest_id = self.site_code_id.location_id
         self.partner_id = self.site_code_id.partner_id
+        self.location_dest_id = self.site_code_id.location_id
     
     owner_id = fields.Many2one('res.partner', 'Owner',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, default=_default_owner,
