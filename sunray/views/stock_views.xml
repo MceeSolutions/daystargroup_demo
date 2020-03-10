@@ -111,6 +111,8 @@
         	<button name="action_rfq_send" position="attributes"> <attribute name="groups">purchase.group_purchase_user</attribute> </button>
         	<field name="name" position="before">
             	<field name= "need_override" invisible = "1"/>
+            	<field name= "need_first_management_approval" invisible = "1"/>
+            	<field name= "need_second_management_approval" invisible = "1"/>
             	<field name= "inform_budget_owner" invisible = "1"/>
             	<field name= "need_finance_review" invisible = "1"/>
             	<field name= "finance_review_done" invisible = "1"/>
@@ -154,7 +156,7 @@
         	</xpath>
         	
         	<xpath expr="//button[@name='button_confirm']" position="replace">
-        		<button name="button_confirm" type="object" states="management" string="Approve Order" id="draft_confirm" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>
+        		<button name="button_confirm" type="object" string="Approve Order" id="draft_confirm" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager" invisible="1"/>
         	</xpath>
         	<xpath expr="//button[@name='button_cancel']" position="replace">
         		<button name="button_cancel" type="object" states="management" string="Decline Order" id="draft_decline" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>
@@ -169,7 +171,12 @@
         	</xpath>
         	
         	<xpath expr="//button[@name='button_approve']" position="replace">
-        		<button name="button_approve" type="object" states='management,legal_reviewed' string="Confirm Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
+        		<button name="button_approve" type="object" string="Confirm Order" class="oe_highlight" groups="purchase.group_purchase_manager" invisible="1"/>
+        	</xpath>
+        	
+        	<xpath expr="//button[@name='button_approve']" position="before">
+        		<button name="action_first_manager_approval" type="object" attrs="{'invisible':['|', ('state','!=','management'), ('need_first_management_approval','!=',True)]}" string="Confirm Order" class="oe_highlight" groups="sunray.group_below_1st_authorization"/>
+        		<button name="action_second_manager_approval" type="object" attrs="{'invisible':['|','|', ('state','!=','management'), ('need_first_management_approval','=',True), ('need_second_management_approval','!=',True)]}" string="Confirm Order" class="oe_highlight" groups="sunray.group_above_1st_authorization"/>
         	</xpath>
         	
         	<xpath expr="//button[@name='button_approve']" position="after">
@@ -1413,7 +1420,7 @@
       <field name="name">Store Request</field>
       <field name="res_model">stock.picking</field>
       <field name="view_mode">tree,form</field>
-      <field name="context" eval='{"default_is_locked":False,"default_picking_type_id.code":"outgoing"}'/>
+      <field name="context" eval='{"default_is_locked":False,"default_picking_type_id":22}'/>
     </record>
      
    	 <record id="store_req_action_tree" model="ir.actions.act_window.view">
