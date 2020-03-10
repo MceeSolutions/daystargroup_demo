@@ -620,6 +620,8 @@ class PurchaseOrder(models.Model):
     finance_review_done = fields.Boolean ('Finance Review Done', track_visibility="onchange", copy=False)
     
     need_management_approval = fields.Boolean(string="Management Approval")
+    need_first_management_approval = fields.Boolean(string="Management Approval 1")
+    need_second_management_approval = fields.Boolean(string="Management Approval 2")
     
     state = fields.Selection([
         ('draft', 'RFQ'),
@@ -712,9 +714,8 @@ class PurchaseOrder(models.Model):
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         if self.amount_total < 100000.00:
             self.check_manager_approval_one()
-        else:
-            if self.amount_total > 100000.00:
-                self.check_manager_approval_two()
+        elif self.amount_total > 100000.00:
+            self.check_manager_approval_two()
     
     @api.multi
     def notify_procurement_for_approval(self):
@@ -731,7 +732,7 @@ class PurchaseOrder(models.Model):
     @api.depends('amount_total')
     def check_manager_approval_one(self):
         if self.amount_total < 100000.00:
-            self.need_management_approval = True
+            self.need_first_management_approval = True
             group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_below_1st_authorization')
             user_ids = []
             partner_ids = []
@@ -748,8 +749,9 @@ class PurchaseOrder(models.Model):
     @api.depends('amount_total')
     def check_manager_approval_two(self):
         if self.amount_total > 100000.00:
-            self.need_management_approval = True
-            group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_above_1st_authorization')
+            self.need_first_management_approval = True
+            self.need_second_management_approval = True
+            group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_above_1st_authorization','sunray.group_below_1st_authorization')
             user_ids = []
             partner_ids = []
             for user in group_id.users:
@@ -847,12 +849,36 @@ class PurchaseOrder(models.Model):
         return True
     
     @api.multi
+    def action_first_manager_approval(self):
+        if self.need_first_management_approval == True: 
+            self.approval_date = date.today()
+            self.manager_approval = self._uid
+            if self.need_second_management_approval == False:
+                self.button_approve()
+        subject = "RFQ {} has been approved".format(self.name)
+        partner_ids = []
+        for partner in self.message_partner_ids:
+            partner_ids.append(partner.id)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.need_first_management_approval = False
+        
+    @api.multi
+    def action_second_manager_approval(self):
+        if self.need_second_management_approval == True: 
+            self.second_manager_approval_date  = date.today()
+            self.second_manager_approval  = self._uid
+            self.button_approve()
+        subject = "RFQ {} has been approved".format(self.name)
+        partner_ids = []
+        for partner in self.message_partner_ids:
+            partner_ids.append(partner.id)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+    
+    @api.multi
     def button_approve(self):
         res = super(PurchaseOrder, self).button_approve()
         self._check_vendor_registration()
         self._check_line_manager()
-        self.approval_date = date.today()
-        self.manager_approval = self._uid
         return res
     
     @api.multi
