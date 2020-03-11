@@ -604,11 +604,11 @@ class PurchaseOrder(models.Model):
     
     approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
-    manager_position = fields.Char('Manager Position', readonly=True, track_visibility='onchange')
+    manager_position = fields.Char('Manager Position', track_visibility='onchange')
     
     second_manager_approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     second_manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
-    second_manager_position = fields.Char('2nd Manager Position', readonly=True, track_visibility='onchange')
+    second_manager_position = fields.Char('2nd Manager Position', track_visibility='onchange')
     
     
     po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
@@ -715,6 +715,7 @@ class PurchaseOrder(models.Model):
         self.write({'state':'management'})
         self.po_approval_date = date.today()
         self.po_manager_approval = self._uid
+        self.po_manager_position = self._check_manager_position()
         subject = "RFQ {} has been approved by Procurement".format(self.name)
         partner_ids = []
         for partner in self.message_partner_ids:
