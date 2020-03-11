@@ -685,6 +685,14 @@
                     	<field name="site_area" required="1"/>
                     	<field name="num" invisible="1"/>
                         <!-- <field name="active"/>  -->
+                        <label for="site_address" string="Site Address"/>
+			   	       	<div class="o_address_format">
+			                <field name="address_number" placeholder="Number" class="o_address_street"/>
+			                <field name="address_street" placeholder="Street..." class="o_address_street"/>
+			                <field name="address_city" placeholder="City" class="o_address_city"/>
+			           		<field name="address_state_id" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
+			                <field name="address_country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+			            </div>
                     </group>
                 </sheet>
             </form>
@@ -1495,7 +1503,7 @@
                         	<field name="is_locked" invisible="1"/>
                         	<field name="employee_id" required="1" groups="stock.group_stock_manager"/>
                         	<!-- <field name="man_confirm" readonly="1"/> -->
-                            <field name="partner_id" attrs="{'invisible': [('picking_type_code', '=', 'internal')]}"/>
+                            <field name="partner_id" attrs="{'invisible': [('picking_type_code', '=', 'internal')]}" required="1"/>
                             <field name="location_id" groups="stock.group_stock_user"  attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"/>
                             <!-- <field name="location_dest_id" groups="stock.group_stock_user" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/> -->
                             <field name="location_dest_id" groups="stock.group_stock_user" invisible="1"/>

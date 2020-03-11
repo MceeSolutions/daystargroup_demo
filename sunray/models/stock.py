@@ -1554,6 +1554,13 @@ class SiteCode(models.Model):
     display_name = fields.Char(string="display_name", store=True)
     num = fields.Integer(string="Num", store=True)
     
+    site_address = fields.Char(string='Site Address')
+    address_number = fields.Char(string='Number')
+    address_street = fields.Char(string='Street')
+    address_city = fields.Char(string='City')
+    address_state_id = fields.Many2one(comodel_name="res.country.state", string='State', ondelete='restrict', related='state_id')
+    address_country_id = fields.Many2one(comodel_name='res.country', string='Country', ondelete='restrict', related='state_id.country_id')
+    
     @api.multi
     def _check_site_code(self, vals):
         site = self.env['site.code'].search([('name','=',vals['name'])])
@@ -2476,6 +2483,7 @@ class Picking(models.Model):
     
     @api.onchange('site_code_id')
     def _onchange_site_id(self):
+        self.partner_id = self.site_code_id.partner_id
         self.location_dest_id = self.site_code_id.location_id
     
     owner_id = fields.Many2one('res.partner', 'Owner',
