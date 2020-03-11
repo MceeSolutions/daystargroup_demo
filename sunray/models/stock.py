@@ -613,7 +613,7 @@ class PurchaseOrder(models.Model):
     
     po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
     po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
-    po_manager_position = fields.Char('Manager Authorization Position', readonly=True, track_visibility='onchange')
+    po_manager_position = fields.Char('Manager Authorization Position', track_visibility='onchange')
     
     line_manager_approval_date = fields.Date(string='Line-Manager Approval Date', readonly=True, track_visibility='onchange')
     line_manager_approval = fields.Many2one('res.users','Line-Manager Approval Name', readonly=True, track_visibility='onchange')
