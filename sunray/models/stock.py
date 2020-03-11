@@ -545,6 +545,11 @@ class PurchaseOrder(models.Model):
             raise UserError(_('You are not allowed to approve your own request.'))
         
     @api.multi
+    def _check_manager_position(self):
+        current_manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        return current_manager.job_id.name
+    
+    @api.multi
     def _check_vendor_registration(self):
         return True
 #         if self.partner_id.vendor_registration == False:
@@ -600,8 +605,11 @@ class PurchaseOrder(models.Model):
     approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
     manager_position = fields.Char('Manager Position', readonly=True, track_visibility='onchange')
+    
     second_manager_approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     second_manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
+    second_manager_position = fields.Char('2nd Manager Position', readonly=True, track_visibility='onchange')
+    
     
     po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
     po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
@@ -853,6 +861,7 @@ class PurchaseOrder(models.Model):
         if self.need_first_management_approval == True: 
             self.approval_date = date.today()
             self.manager_approval = self._uid
+            self.manager_position = self._check_manager_position()
             if self.need_second_management_approval == False:
                 self.button_approve()
         subject = "RFQ {} has been approved".format(self.name)
@@ -867,6 +876,7 @@ class PurchaseOrder(models.Model):
         if self.need_second_management_approval == True: 
             self.second_manager_approval_date  = date.today()
             self.second_manager_approval  = self._uid
+            self.second_manager_position = self._check_manager_position()
             self.button_approve()
         subject = "RFQ {} has been approved".format(self.name)
         partner_ids = []

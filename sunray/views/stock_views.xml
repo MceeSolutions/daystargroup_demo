@@ -1428,7 +1428,7 @@
       <field name="name">Store Request</field>
       <field name="res_model">stock.picking</field>
       <field name="view_mode">tree,form</field>
-      <field name="context" eval='{"default_is_locked":False,"default_picking_type_id":22}'/>
+      <field name="context" eval='{"default_is_locked":False,"default_picking_type_code":"outgoing"}'/>
     </record>
      
    	 <record id="store_req_action_tree" model="ir.actions.act_window.view">
@@ -1508,7 +1508,7 @@
                             <!-- <field name="location_dest_id" groups="stock.group_stock_user" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/> -->
                             <field name="location_dest_id" groups="stock.group_stock_user" invisible="1"/>
                             <field name="backorder_id" readonly="1" attrs="{'invisible': [('backorder_id','=',False)]}"/>
-                            <field name="site_code_id" required="1"/>
+                            <field name="site_code_id" required="1" domain="[('partner_id','=', partner_id)]"/>
                         </group>
                         <group>
                             <field name="scheduled_date" attrs="{'readonly': [('id', '=', False)], 'required': [('id', '!=', False)]}"/>
