@@ -2523,6 +2523,8 @@ class Picking(models.Model):
     total_cost = fields.Float(string='Total Cost', compute='_total_cost', track_visibility='onchange', readonly=True)
     send_receipt_mail = fields.Boolean(string='receipt mail')
     
+    picking_type_id_name = fields.Char(string='Picking Type Name', related='picking_type_id.name')
+    
     order_no = fields.Char(string='Order No/Model')
     ship_status = fields.Char(string='Shipment Status')
     bu = fields.Char(string='BU')

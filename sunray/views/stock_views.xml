@@ -1508,7 +1508,7 @@
                             <!-- <field name="location_dest_id" groups="stock.group_stock_user" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/> -->
                             <field name="location_dest_id" groups="stock.group_stock_user" invisible="1"/>
                             <field name="backorder_id" readonly="1" attrs="{'invisible': [('backorder_id','=',False)]}"/>
-                            <field name="site_code_id" required="1" domain="[('partner_id','=', partner_id)]"/>
+                            <field name="site_code_id" attrs="{'required': [('picking_type_id_name', '!=', 'Receipts')]}" domain="[('partner_id','=', partner_id)]"/>
                         </group>
                         <group>
                             <field name="scheduled_date" attrs="{'readonly': [('id', '=', False)], 'required': [('id', '!=', False)]}"/>
@@ -1591,9 +1591,10 @@
                         <page string="Additional Info" name="extra" groups="stock.group_stock_user">
                             <group>
                                 <group>
-                                    <field name="picking_type_code" invisible="1"/>
+                                    <field name="picking_type_code" />
                                     <field name="move_type" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/>
                                     <field name="picking_type_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="picking_type_id_name" invisible="1"/>
                                     <field name="project_id" readonly="1"/>
                                 </group>
                                 <group>
