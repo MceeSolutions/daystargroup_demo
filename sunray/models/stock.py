@@ -1602,10 +1602,12 @@ class SiteCode(models.Model):
 #         product = self.env[res_model].browse(res_id) 
         return super(SiteCode, self).create(vals)
     
-    @api.multi
-    def write(self, vals):
-        self._check_site_code(vals)
-        return super(SiteCode, self).write(vals)
+    #@api.onchange('name')
+    #def write(self, vals):
+        #site = self.env['site.code'].search([('name','=',vals['name'])])
+        #if site:
+            #raise UserError(_('Site Code Must Unique!'))
+        #return super(SiteCode, self).write(vals)
     
     '''
     @api.multi
