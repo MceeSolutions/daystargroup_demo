@@ -716,15 +716,12 @@ class PurchaseOrder(models.Model):
         self.po_approval_date = date.today()
         self.po_manager_approval = self._uid
         self.po_manager_position = self._check_manager_position()
+        self.button_request_finance_review()
         subject = "RFQ {} has been approved by Procurement".format(self.name)
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        if self.amount_total < 100000.00:
-            self.check_manager_approval_one()
-        elif self.amount_total > 100000.00:
-            self.check_manager_approval_two()
     
     @api.multi
     def notify_procurement_for_approval(self):
@@ -789,14 +786,17 @@ class PurchaseOrder(models.Model):
         return False
     
     @api.multi
-    def button_legal_reviewd(self):
+    def button_finance_reviewd(self):
         self.need_finance_review_done = True
-        self.write({'state': 'legal_reviewed'})
-        subject = "Legal team review has been Done, Purchase Order {} can be confirmed now".format(self.name)
+        subject = "Finance Review has been Done".format(self.name)
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        if self.amount_total < 100000.00:
+            self.check_manager_approval_one()
+        elif self.amount_total > 100000.00:
+            self.check_manager_approval_two()
     
     @api.multi
     def _check_budget(self):
@@ -896,14 +896,14 @@ class PurchaseOrder(models.Model):
     def button_request_finance_review(self):
         #self.write({'state': 'approve'})
         self.need_finance_review = True
-        group_id = self.env['ir.model.data'].xmlid_to_object('account.group_account_user')
+        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_po_finance')
         user_ids = []
         partner_ids = []
         for user in group_id.users:
             user_ids.append(user.id)
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
-        subject = "This RFQ {} needs your review".format(self.name)
+        subject = "This RFQ '{}' needs review from Finance".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return {}
     
