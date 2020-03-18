@@ -2524,6 +2524,7 @@ class Picking(models.Model):
     send_receipt_mail = fields.Boolean(string='receipt mail')
     
     picking_type_id_name = fields.Char(string='Picking Type Name', related='picking_type_id.name')
+    picking_type_id_code = fields.Selection([('incoming', 'Vendors'), ('outgoing', 'Customers'), ('internal', 'Internal')], string='Picking Type Code', related='picking_type_id.code')
     
     order_no = fields.Char(string='Order No/Model')
     ship_status = fields.Char(string='Shipment Status')
@@ -3315,6 +3316,14 @@ class HrPayslipRun(models.Model):
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
+    
+    prorate_days = fields.Float(string='Prorate Days', required=False, help="Proration Days")
+    
+    @api.onchange('prorate_days')
+    def _check_proration(self):
+        if self.prorate_days > 0:
+            for line in self.line_ids:
+                line.amount = line.amount*self.prorate_days/self.worked_days_line_ids.number_of_days
     
     @api.multi
     def action_payslip_done(self):
