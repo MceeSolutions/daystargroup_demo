@@ -208,16 +208,11 @@ class Partners(models.Model):
         self._check_potential_customer(vals)
         return super(Partners, self).create(vals)
     
-    '''
-=======
-        return super(Partner, self).create(vals)
-    
->>>>>>> ce47406a21c8d6a08aaa79d6575c5b537eeb49da
+    ''' 
     @api.multi
     def write(self, vals):
         self._check_customer_code(vals)
         return super(Partner, self).write(vals)
-<<<<<<< HEAD
     '''
     
     @api.multi
@@ -604,16 +599,16 @@ class PurchaseOrder(models.Model):
     
     approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
-    manager_position = fields.Char('Manager Position', readonly=True, track_visibility='onchange')
+    manager_position = fields.Char('Manager Position', track_visibility='onchange')
     
     second_manager_approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     second_manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
-    second_manager_position = fields.Char('2nd Manager Position', readonly=True, track_visibility='onchange')
+    second_manager_position = fields.Char('2nd Manager Position', track_visibility='onchange')
     
     
     po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
     po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
-    po_manager_position = fields.Char('Manager Authorization Position', readonly=True, track_visibility='onchange')
+    po_manager_position = fields.Char('Manager Authorization Position', track_visibility='onchange')
     
     line_manager_approval_date = fields.Date(string='Line-Manager Approval Date', readonly=True, track_visibility='onchange')
     line_manager_approval = fields.Many2one('res.users','Line-Manager Approval Name', readonly=True, track_visibility='onchange')
