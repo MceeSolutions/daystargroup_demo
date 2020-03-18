@@ -619,7 +619,7 @@ class PurchaseOrder(models.Model):
     
     inform_budget_owner = fields.Boolean ('Inform Budget Owner', track_visibility="onchange", copy=False)
     need_finance_review = fields.Boolean ('Finance Review', track_visibility="onchange", copy=False)
-    need_finance_review_done = fields.Boolean ('Finance / Legal Review', track_visibility="onchange", copy=False)
+    need_finance_review_done = fields.Boolean ('Finance Review Done', track_visibility="onchange", copy=False)
     finance_review_done = fields.Boolean ('Finance Review Done', track_visibility="onchange", copy=False)
     
     need_management_approval = fields.Boolean(string="Management Approval")

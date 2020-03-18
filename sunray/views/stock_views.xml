@@ -145,7 +145,7 @@
         		<button name="button_submit" string="Submit to Manager" type="object" states="draft"  groups="base.group_user"/>
         		<button name="button_inform_budget_owner" string="Inform Budget Owner" type="object" attrs="{'invisible': ['|', ('state', '=', 'purchase'), ('inform_budget_owner', '=', True)]}" groups="base.group_user"/>
         		<!-- <button name="button_request_finance_review" string="Request Finance Review" type="object" attrs="{'invisible': ['|', ('state', '=', 'purchase'), ('need_finance_review', '=', True)]}" groups="base.group_user"/> -->
-        		<button name="button_finance_reviewd" string="Finance Review Done" type="object" attrs="{'invisible': ['|', '|', ('state', '=', 'purchase'), ('need_finance_review', '=', False), ('need_finance_review_done', '=', True)]}" groups="sunray.group_po_finance"/>
+        		<button name="button_finance_reviewd" string="Finance Review Done" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|', ('state', '=', 'purchase'), ('need_finance_review', '=', False), ('need_finance_review_done', '=', True)]}" groups="sunray.group_po_finance"/>
         	</xpath>
         	
         	<xpath expr="//button[@name='button_cancel']" position="after">
