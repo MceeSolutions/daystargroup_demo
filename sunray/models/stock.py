@@ -3317,13 +3317,13 @@ class HrPayslipRun(models.Model):
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
     
-    prorate_days = fields.Float(string='Prorate Days', required=False, help="Proration Days")
+    prorate_days = fields.Float(string='Proration Days', required=False, help="Proration Days")
     
-    @api.onchange('prorate_days')
-    def _check_proration(self):
-        if self.prorate_days > 0:
-            for line in self.line_ids:
-                line.amount = line.amount*self.prorate_days/self.worked_days_line_ids.number_of_days
+    #@api.onchange('prorate_days')
+    #def _check_proration(self):
+     #   if self.prorate_days > 0:
+      #      for line in self.line_ids:
+       #         line.amount = line.amount*self.prorate_days/self.worked_days_line_ids.number_of_days
     
     @api.multi
     def action_payslip_done(self):
