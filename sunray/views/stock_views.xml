@@ -220,6 +220,10 @@
 		            	<field name="po_manager_approval"/>
 		            	<field name="po_approval_date"/>
 		        	</group>
+		        	<group string = "Finance Approval" col="4" colspan="4">
+		            	<field name="finance_manager_approval"/>
+		            	<field name="finance_manager_approval_date"/>
+		        	</group>
             		<group string = "First Authorization" col="4" colspan="4">
 		            	<field name="manager_approval"/>
 		            	<field name="approval_date"/>

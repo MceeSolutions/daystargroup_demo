@@ -605,6 +605,9 @@ class PurchaseOrder(models.Model):
     second_manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
     second_manager_position = fields.Char('2nd Manager Position', track_visibility='onchange')
     
+    finance_manager_approval_date = fields.Date(string='Finance Approval Date', readonly=True, track_visibility='onchange')
+    finance_manager_approval = fields.Many2one('res.users','Finance Approval Name', readonly=True, track_visibility='onchange')
+    finance_manager_position = fields.Char('Finance Personnel Position', track_visibility='onchange')    
     
     po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
     po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
@@ -783,6 +786,9 @@ class PurchaseOrder(models.Model):
     @api.multi
     def button_finance_reviewd(self):
         self.need_finance_review_done = True
+        self.finance_manager_approval_date = date.today()
+        self.finance_manager_approval = self._uid
+        self.finance_manager_position = self._check_manager_position()
         subject = "Finance Review has been Done".format(self.name)
         partner_ids = []
         for partner in self.message_partner_ids:
