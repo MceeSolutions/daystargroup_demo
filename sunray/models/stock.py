@@ -1004,6 +1004,7 @@ class PurchaseOrderLine(models.Model):
 
 class PurchaseRequisition(models.Model):
     _name = "purchase.requisition"
+    _description = "Procurement Request"
     _inherit = ['purchase.requisition']
     
     @api.multi
@@ -1049,6 +1050,15 @@ class PurchaseRequisition(models.Model):
     
     total_cost = fields.Float(string='Total Cost', compute='_total_cost', track_visibility='onchange', readonly=True)
     
+    type_of_request = fields.Selection([
+        ('bid', 'Bid'),
+        ('contract', 'Contract'),
+        ('urgent', 'Urgent'),
+        ('single_source', 'Single Source')], string='Type of Request',
+        copy=False, default='bid', track_visibility='onchange')
+    
+    justification = fields.Char('Justification', readonly=False, track_visibility='onchange')
+        
     @api.multi
     @api.depends('line_ids.price_subtotal')
     def _total_cost(self):
@@ -1062,11 +1072,15 @@ class PurchaseRequisition(models.Model):
         self.write({'state':'submit'})
         #group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
         #user_ids = []
-        partner_ids = []
-        partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
+        #partner_ids = []
+        #partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
         #for user in group_id.users:
         #    user_ids.append(user.id)
         #    partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
+        user_ids = []
+        partner_ids = []
+        if self.employee_id.parent_id.user_id:
+            partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "Procurement Request '{}' needs approval".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
@@ -1144,6 +1158,7 @@ class PurchaseRequisition(models.Model):
         else:
             self.need_approval = False
     
+    
 class PurchaseRequisitionLine(models.Model):
     _name = "purchase.requisition.line"
     _inherit = ['purchase.requisition.line']
@@ -1158,7 +1173,8 @@ class PurchaseRequisitionLine(models.Model):
     
     project_id = fields.Many2one(comodel_name='project.project', string='Site Location')
     
-    description = fields.Char(string='Description')
+    product_id = fields.Many2one('product.product', string='Product', domain=[('purchase_ok', '=', True)], required=False)
+    description = fields.Char(string='Description', required=True)
     
     price_subtotal = fields.Float(string="Price Subtotal", compute="_compute_subtotal", readonly=True)
     
@@ -1169,6 +1185,30 @@ class PurchaseRequisitionLine(models.Model):
     def _compute_subtotal(self):
         for line in self:
             self.price_subtotal = line.price_unit * self.product_qty
+    
+    @api.multi
+    def _prepare_purchase_order_line(self, name, product_qty=0.0, price_unit=0.0, taxes_ids=False):
+        self.ensure_one()
+        requisition = self.requisition_id
+        if requisition.schedule_date:
+            date_planned = datetime.datetime.combine(requisition.schedule_date, time.min)
+        else:
+            date_planned = datetime.datetime.now()
+        if not self.product_id:
+            raise UserError(_('Product(s) Must be created before becoming an RFQ'))
+        return {
+            #'name': name,
+            'product_id': self.product_id.id,
+            'name': self.description,
+            'product_uom': self.product_id.uom_po_id.id,
+            'product_qty': product_qty,
+            'price_unit': price_unit,
+            'taxes_id': [(6, 0, taxes_ids)],
+            'date_planned': date_planned,
+            'account_analytic_id': self.account_analytic_id.id,
+            'analytic_tag_ids': self.analytic_tag_ids.ids,
+            'move_dest_ids': self.move_dest_id and [(4, self.move_dest_id.id)] or []
+        }
     
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
