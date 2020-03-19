@@ -1573,6 +1573,8 @@ class SiteCode(models.Model):
     address_state_id = fields.Many2one(comodel_name="res.country.state", string='State', ondelete='restrict', related='state_id')
     address_country_id = fields.Many2one(comodel_name='res.country', string='Country', ondelete='restrict', related='state_id.country_id')
     
+    lead_id = fields.Many2one(comodel_name='crm.lead', string='Lead / Opportunity')
+    
     @api.multi
     def _check_site_code(self, vals):
         site = self.env['site.code'].search([('name','=',vals['name'])])
@@ -1619,6 +1621,34 @@ class SiteCode(models.Model):
             site_code = code + "_" +  str(no)
             self.name = site_code
     '''
+    
+    @api.multi
+    def create_project_from_site_code(self):
+        if self.lead_id:
+            if not self.lead_id.site_code_id:
+                self.lead_id.site_code_id = self.id
+                self.lead_id.create_project_from_lead()
+                self.project_id = self.lead_id.project_id
+            else:
+                self.lead_id.create_project_from_lead()
+                self.project_id = self.lead_id.project_id
+        else:
+            project_line = self.env['project.project'].create({
+                 'site_code_id': self.id,
+                 'crm_lead_id': self.lead_id.id,
+                 'name': self.name,
+                 'partner_id': self.partner_id.id,
+                 'site_area': self.site_area,
+                 'site_address': self.site_address,
+                 'site_location_id': self.state_id.id
+            })
+            self.project_id = project_line
+        return {}
+    
+    @api.onchange('lead_id')
+    def _onchange_partner_id(self):
+        self.partner_id = self.lead_id.partner_id
+        
     
 class Project(models.Model):
     _name = "project.project"

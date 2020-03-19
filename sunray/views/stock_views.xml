@@ -672,19 +672,22 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form string = "Site Location">
-            	<!-- <header>
-            		<button string="Generate Code" name="action_generate" type="object" class="oe_highlight"/>
-            	</header> -->
+            	<header>
+            		<button string="Create Project" name="create_project_from_site_code" type="object" class="oe_highlight" attrs="{'invisible': [('project_id', '!=', False)]}"/>
+            	</header>
                 <sheet>
                	<div class="oe_button_box" name="button_box">
 	                <button name="toggle_active" type="object" groups="base.group_user" class="oe_stat_button" icon="fa-archive">
                         <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
                     </button>
                 </div>
+                	<group>
+                		<field name="lead_id"/>
+                	</group>
                     <group col="4" colspan="2">
                     	<field name="partner_id"/>
                     	<field name="state_id"/>
-                    	<field name="name" string="Code" readonly="1" required="0"/>
+                    	<field name="name" string="Code" readonly="0" required="0"/>
                     	<field name="project_id"/>
                     	<field name="site_area" required="1"/>
                     	<field name="num" invisible="1"/>
