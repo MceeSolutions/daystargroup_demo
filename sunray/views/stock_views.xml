@@ -1195,7 +1195,7 @@
             </xpath>
             <xpath expr="//field[@name='move_raw_ids']/tree/field[@name='product_uom_qty']" position="before">
             	<field name="account_id"/>
-            	<field name="account_analytic_id"/>
+            	<field name="analytic_account_id"/>
             </xpath>
             <xpath expr="//notebook" position="before">
                 <group class="oe_subtotal oe_left">
@@ -1528,6 +1528,7 @@
                             <field name="location_dest_id" groups="stock.group_stock_user" invisible="1"/>
                             <field name="backorder_id" readonly="1" attrs="{'invisible': [('backorder_id','=',False)]}"/>
                             <field name="site_code_id" attrs="{'required': [('picking_type_id_name', '!=', 'Receipts')]}" domain="[('partner_id','=', partner_id)]"/>
+                            <field name="analytic_account_id" groups="sunray.group_hr_line_manager"/>
                         </group>
                         <group>
                             <field name="scheduled_date" attrs="{'readonly': [('id', '=', False)], 'required': [('id', '!=', False)]}"/>
