@@ -88,6 +88,8 @@ class Lead(models.Model):
     
     site_code_request_id = fields.Many2one('site.code.request', string='Request Site Code', index=True, track_visibility='onchange')
     
+    project_id = fields.Many2one(comodel_name='project.project', string='Project', required=False)
+    
     '''
     @api.multi
     def generate_site_code(self, vals):
@@ -111,23 +113,24 @@ class Lead(models.Model):
     def create_project_from_lead(self):
         #if self.stage_id.id == 29:
         project_line = self.env['project.project'].create({
-                 'crm_lead_id': self.id,
-                 'name': self.site_code_id.name,
-                 'partner_id': self.partner_id.id,
-                 'site_code_id': self.site_code_id.id,
-                 'site_area': self.site_area,
-                 'site_address': self.site_address,
-                 'site_type': self.site_type,
-                 'country_id': self.country_id.id,
-                 'lease_duration': self.contract_duration,
-                 'coordinates': self.coordinates,
-                 'type_of_offer': self.type_of_offer,
-                 'tariff_per_kwp': self.tariff_per_kwp,
-                 'site_location_id': self.site_location_id.id,
-                 'total_capacity': self.total_capacity,
-                 'solar_capacity': self.solar_capacity,
-                 'sales_price': self.sales_price
+            'crm_lead_id': self.id,
+            'name': self.site_code_id.name,
+            'partner_id': self.partner_id.id,
+            'site_code_id': self.site_code_id.id,
+            'site_area': self.site_area,
+            'site_address': self.site_address,
+            'site_type': self.site_type,
+            'country_id': self.country_id.id,
+            'lease_duration': self.contract_duration,
+            'coordinates': self.coordinates,
+            'type_of_offer': self.type_of_offer,
+            'tariff_per_kwp': self.tariff_per_kwp,
+            'site_location_id': self.site_location_id.id,
+            'total_capacity': self.total_capacity,
+            'solar_capacity': self.solar_capacity,
+            'sales_price': self.sales_price
             })
+        self.project_id = project_line
         return {}
     
     @api.multi
