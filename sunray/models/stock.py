@@ -2442,7 +2442,7 @@ class Picking(models.Model):
     _inherit = 'stock.picking'
     
     @api.one
-    @api.depends('site_code_id')
+    @api.depends('site_code_id','site_code_id.project_id')
     def _get_analytic_account(self):
         if self.site_code_id.project_id.analytic_account_id:
             self.analytic_account_id = self.site_code_id.project_id.analytic_account_id.id
@@ -3110,8 +3110,10 @@ class StockMove(models.Model):
         res = super(StockMove, self)._prepare_account_move_line(
             qty, cost, credit_account_id, debit_account_id)
         # Add analytic account in debit line
-        if not self.analytic_account_id or not res:
+        if not res:
             return res
+        if not self.analytic_account_id:
+            self.picking_id.site_code_id.create_project_from_site_code()
 
         for num in range(0, 2):
             if res[num][2]["account_id"] != self.product_id.\
