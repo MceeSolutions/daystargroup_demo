@@ -894,6 +894,11 @@ class PurchaseOrder(models.Model):
         return res
     
     @api.multi
+    def button_approve_without_authorization(self):
+        res = super(PurchaseOrder, self).button_approve()
+        return res
+    
+    @api.multi
     def button_request_finance_review(self):
         #self.write({'state': 'approve'})
         self.need_finance_review = True

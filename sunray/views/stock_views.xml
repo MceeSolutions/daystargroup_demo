@@ -203,6 +203,7 @@
         	
         	<xpath expr="//button[@name='button_approve']" position="replace">
         		<button name="button_approve" type="object" string="Confirm Order" class="oe_highlight" groups="purchase.group_purchase_manager" invisible="1"/>
+        		<button name="button_approve_without_authorization" type="object" string="Confirm Order" attrs="{'invisible': [ ('state', 'in', ('purchase','done'))]}" class="oe_highlight" groups="base.group_no_one" invisible="0"/>
         	</xpath>
         	
         	<xpath expr="//button[@name='button_approve']" position="before">
