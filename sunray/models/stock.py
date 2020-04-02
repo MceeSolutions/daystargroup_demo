@@ -2441,6 +2441,16 @@ class Picking(models.Model):
     _name = "stock.picking"
     _inherit = 'stock.picking'
     
+    @api.one
+    @api.depends('site_code_id','site_code_id.project_id')
+    def _get_analytic_account(self):
+        if self.site_code_id.project_id.analytic_account_id:
+            self.analytic_account_id = self.site_code_id.project_id.analytic_account_id.id
+    
+    analytic_account_id = fields.Many2one(
+        string='Analytic Account',
+        comodel_name='account.analytic.account', compute='_get_analytic_account', store=True 
+    )
     state = fields.Selection([
         ('draft', 'Draft'),
         ('approve', 'Approved'),
@@ -3080,8 +3090,8 @@ class StockMove(models.Model):
     def _default_cost(self):
         return self.product_id.standard_price
     
-    def _default_analytic(self):
-        return self.env['account.analytic.account'].search([('name','=','Sunray')])
+#     def _default_analytic(self):
+#         return self.env['account.analytic.account'].search([('name','=','Sunray')])
     
     @api.multi
     @api.onchange('product_id')
@@ -3092,6 +3102,26 @@ class StockMove(models.Model):
         else:
             acc_dest = accounts_data['stock_output'].id
         self.account_id = acc_dest
+
+    @api.multi
+    def _prepare_account_move_line(self, qty, cost,
+                                   credit_account_id, debit_account_id):
+        self.ensure_one()
+        res = super(StockMove, self)._prepare_account_move_line(
+            qty, cost, credit_account_id, debit_account_id)
+        # Add analytic account in debit line
+        if not res:
+            return res
+        if not self.analytic_account_id and self.picking_id:
+            self.sudo().picking_id.site_code_id.create_project_from_site_code()
+
+        for num in range(0, 2):
+            if res[num][2]["account_id"] != self.product_id.\
+                    categ_id.property_stock_valuation_account_id.id:
+                res[num][2].update({
+                    'analytic_account_id': self.analytic_account_id.id,
+                })
+        return res
         
     def _create_account_move_line(self, credit_account_id, debit_account_id, journal_id):
         self.ensure_one()
@@ -3164,11 +3194,19 @@ class StockMove(models.Model):
 #         return acc_dest
         
     
-    account_analytic_id = fields.Many2one('account.analytic.account', string='Analytic Acount', required=False, default=_default_analytic, track_visibility="always")
+#     account_analytic_id = fields.Many2one('account.analytic.account', string='Analytic Acount', required=False, default=_default_analytic, track_visibility="always")
+    analytic_account_id = fields.Many2one(
+        related='picking_id.analytic_account_id', store=True)
     account_id = fields.Many2one('account.account', string='Account', index=True, ondelete='cascade')
     
     price_cost = fields.Float(string="Cost", related='product_id.standard_price')
     price_subtotal = fields.Float(string="Price Subtotal", compute="_compute_subtotal", readonly=True)
+
+class StockMoveLine(models.Model):
+    _inherit = "stock.move.line"
+
+    analytic_account_id = fields.Many2one(
+        related='move_id.analytic_account_id')
 
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
