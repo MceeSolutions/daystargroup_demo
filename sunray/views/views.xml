@@ -41,6 +41,14 @@
       <field name="view_mode">tree,form</field>
     </record>
     
+    <record model="ir.actions.act_window" id="crm_action_partner_form">
+      <field name="name">Customer</field>
+      <field name="res_model">res.partner</field>
+      <field name="context">{"default_supplier": 0, "default_customer": 0, "default_potential_customer": 1}</field>
+      <field name="domain">[('customer', '=', True)]</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    
     <record model="ir.actions.act_window" id="ContactRequest_action_window">
       <field name="name">Contacts Request</field>
       <field name="res_model">new.contact.request</field>
@@ -77,11 +85,13 @@
         
         <record id="site_code_requested_view_form" model="ir.ui.view">
             <field name="name">site.code.requested.form</field>
-            <field name="model">site.code.requested</field>
+            <field name="model">site.code.request</field>
             <field name="arch" type="xml">
                 <form string="Site Code Request">
                     <group class="oe_title">
-                        <field name="site_code_request_id" required="1"/>
+                        <field name="partner_id" required="1"/>
+                        <field name="state_id" required="1"/>
+                        <field name="area" required="1"/>
                     </group>
                     <footer>
                         <button name="action_request_information_apply" string="Send Request" type="object" class="btn btn-sm btn-primary"/>
@@ -94,7 +104,8 @@
     	<record id="site_code_request_action" model="ir.actions.act_window">
             <field name="name">Site Code Request</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">site.code.requested</field>
+            <field name="res_model">site.code.request</field>
+            <field name="context">{"default_partner_id": active_ids.partner_id}</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="site_code_requested_view_form"/>
             <field name="target">new</field>
@@ -1234,6 +1245,12 @@
 	            </xpath>
 	        </field>
 	</record>
+    
+    <menuitem id="crm.res_partner_menu_customer"
+            name="Customers"
+            parent="crm.crm_menu_sales"
+            action="crm_action_partner_form"
+            sequence="5"/>
     
     <menuitem action="repair.action_repair_order_tree" id="repair.menu_repair_order" groups="stock.group_stock_user" name="Replacements" sequence="36"
             web_icon="repair,static/description/icon.png"/>

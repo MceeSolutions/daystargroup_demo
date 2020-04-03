@@ -340,12 +340,22 @@ class SiteCodeRequest(models.Model):
             res.append((site.id, result))
         return res
     
+    @api.multi
+    def _default_partner_id(self):
+        leads = self.env['crm.lead'].browse(self.env.context.get('active_ids'))
+        return leads.partner_id
+    
     name = fields.Char('name')
     state_id = fields.Many2one(comodel_name='res.country.state', string='Site location (State)', required=True, track_visibility='onchange')
-    partner_id = fields.Many2one(comodel_name='res.partner', string='Customer', required=True)
+    partner_id = fields.Many2one(comodel_name='res.partner', string='Customer', required=True, default=_default_partner_id)
     area = fields.Char(string="Site Area", required=True)
     active = fields.Boolean('Active', default=False)
     
+    @api.multi
+    def action_request_information_apply(self):
+        leads = self.env['crm.lead'].browse(self.env.context.get('active_ids'))
+        leads.write({'site_code_request_id': self.id})
+        leads.button_request_site_code()
     
 class SiteCodeRequested(models.TransientModel):
     _name = 'site.code.requested'

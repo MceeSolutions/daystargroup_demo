@@ -132,7 +132,6 @@ class Partners(models.Model):
         if customer_code.parent_account_number == self.parent_account_number:
             raise UserError(_('Customer Code Already Exists'))
     
-      
     @api.model
     def create(self, vals):
         #if vals.get('name', 'New') == 'New':
@@ -202,9 +201,15 @@ class Partners(models.Model):
             else:
                 print('nothing')
     
+    @api.multi
+    def _check_customer_code(self, vals):
+        customer_code = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
+        if customer_code:
+            raise UserError(_('Customer Code Already Exists!'))
+    
     @api.model
     def create(self, vals):
-#         self._check_customer_code(vals)
+        self._check_customer_code(vals)
         self._check_potential_customer(vals)
         return super(Partners, self).create(vals)
     
@@ -1636,8 +1641,10 @@ class SiteCode(models.Model):
         #    self.num = existing_site.num + 1
         #else:
         #    self.num = 1
-        
-        code = client.parent_account_number + "_" + site.code
+        if client.parent_account_number:
+            code = client.parent_account_number + "_" + site.code
+        else:
+            raise UserError(_('There is no customer code for the customer'))
         
         no = self.env['ir.sequence'].next_by_code('project.site.code')
         #no = self.num
@@ -1691,8 +1698,17 @@ class SiteCode(models.Model):
         return {}
     
     @api.onchange('lead_id')
-    def _onchange_partner_id(self):
+    def _onchange_lead_id(self):
         self.partner_id = self.lead_id.partner_id
+        
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.name = str(self.partner_id.parent_account_number) + '_'
+        
+    @api.onchange('state_id')
+    def _onchange_state_id(self):
+        if self.partner_id:
+            self.name = str(self.partner_id.parent_account_number) + '_' + str(self.state_id.code) + '_'
         
     
 class Project(models.Model):
