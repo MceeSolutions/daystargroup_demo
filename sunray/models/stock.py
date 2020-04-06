@@ -3133,7 +3133,7 @@ class StockMove(models.Model):
         # Add analytic account in debit line
         if not res:
             return res
-        if not self.analytic_account_id and self.picking_id:
+        if not self.analytic_account_id and self.picking_id and self.picking_id.site_code_id:
             self.sudo().picking_id.site_code_id.create_project_from_site_code()
 
         for num in range(0, 2):
