@@ -3143,6 +3143,12 @@ class StockMove(models.Model):
                     'analytic_account_id': self.analytic_account_id.id,
                 })
         return res
+    
+    def create_account(self):
+        
+        journal_id, acc_src, acc_dest, acc_valuation = self._get_accounting_data_for_valuation()
+        self._create_account_move_line(acc_src, acc_valuation, journal_id)
+        return True
         
     def _create_account_move_line(self, credit_account_id, debit_account_id, journal_id):
         self.ensure_one()
