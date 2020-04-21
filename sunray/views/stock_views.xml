@@ -1124,8 +1124,9 @@
 	    		<button name="create_delivery_list" string="Create Delivery List" type="object" attrs="{'invisible': [('state','=','done')]}" invisible="1"/>
 	    	</xpath>
 	    	<xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='quantity_done']" position="after">
-            	<field name="price_cost"/>
-            	<field name="price_subtotal"/>
+            	<field name="price_unit" attrs="{'invisible': [('picking_type_id', '!=', 1)]}"/>
+<!--             	<field name="price_cost"/>-->
+            	<field name="price_subtotal"/> 
             </xpath>
 			 <field name="move_ids_without_package" position="after">
 	            <group class="oe_subtotal_footer oe_right">
