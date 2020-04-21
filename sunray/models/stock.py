@@ -203,9 +203,10 @@ class Partners(models.Model):
     
     @api.multi
     def _check_customer_code(self, vals):
-        customer_code = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
-        if customer_code:
-            raise UserError(_('Customer Code Already Exists!'))
+        if  vals['supplier'] == False:
+            customer_code = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
+            if customer_code:
+                raise UserError(_('Customer Code Already Exists!'))
     
     @api.model
     def create(self, vals):
@@ -3103,10 +3104,10 @@ class StockMove(models.Model):
     _inherit = "stock.move"
     
     @api.one
-    @api.depends('product_uom_qty', 'price_cost')
+    @api.depends('product_uom_qty', 'price_unit')
     def _compute_subtotal(self):
         for line in self:
-            self.price_subtotal = self.product_uom_qty * line.price_cost
+            self.price_subtotal = self.product_uom_qty * line.price_unit
     
     def _default_cost(self):
         return self.product_id.standard_price
@@ -3115,8 +3116,10 @@ class StockMove(models.Model):
 #         return self.env['account.analytic.account'].search([('name','=','Sunray')])
     
     @api.multi
-    @api.onchange('product_id')
+    @api.onchange('product_id','product_uom_qty')
     def product_change(self):
+        self.price_unit = self.price_cost
+        self.price_subtotal = self.product_uom_qty * self.price_unit
         accounts_data = self.product_id.product_tmpl_id.get_product_accounts()
         if self.location_dest_id.valuation_in_account_id:
             acc_dest = self.location_dest_id.valuation_in_account_id.id
