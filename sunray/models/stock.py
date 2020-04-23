@@ -203,6 +203,7 @@ class Partners(models.Model):
     
     @api.multi
     def _check_customer_code(self, vals):
+        return True
 #         if  vals['supplier'] == False:
 #             customer_code = self.env['res.partner'].search([('parent_account_number','=',vals['parent_account_number'])])
 #             if customer_code:
