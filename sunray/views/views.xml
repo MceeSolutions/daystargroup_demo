@@ -105,7 +105,7 @@
             <field name="name">Site Code Request</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">site.code.request</field>
-            <field name="context">{"default_partner_id": active_ids.partner_id}</field>
+            <field name="context">{}</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="site_code_requested_view_form"/>
             <field name="target">new</field>
