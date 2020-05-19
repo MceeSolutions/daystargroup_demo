@@ -2464,6 +2464,10 @@ class Picking(models.Model):
     _name = "stock.picking"
     _inherit = 'stock.picking'
     
+    def _default_picking_type_id(self): 
+        type = self.env['stock.picking.type'].search([('code','=','outgoing')], limit=1)
+        return type
+    
     @api.one
     @api.depends('site_code_id','site_code_id.project_id')
     def _get_analytic_account(self):
@@ -2602,6 +2606,12 @@ class Picking(models.Model):
     def _onchange_site_id(self):
         self.partner_id = self.site_code_id.partner_id
         self.location_dest_id = self.site_code_id.location_id
+    
+    picking_type_id = fields.Many2one(
+        'stock.picking.type', 'Operation Type',
+        required=True,
+        readonly=True,
+        states={'draft': [('readonly', False)]}, default=_default_picking_type_id)
     
     owner_id = fields.Many2one('res.partner', 'Owner',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, default=_default_owner,
