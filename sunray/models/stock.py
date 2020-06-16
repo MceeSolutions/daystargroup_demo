@@ -3034,9 +3034,10 @@ class AccountInvoice(models.Model):
     
     @api.depends('origin')
     def _check_sale_from(self):
-        if self.origin:
-            if "SO0" in self.origin:
-                self.from_sale = True
+        for sale in self:
+            if sale.origin:
+                if "SO0" in sale.origin:
+                    sale.from_sale = True
             
     def _default_employee(self):
         self.env['hr.employee'].search([('user_id','=',self.env.uid)])
