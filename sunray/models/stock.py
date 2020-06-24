@@ -775,6 +775,17 @@ class PurchaseOrder(models.Model):
         else:
             self.need_management_approval = False
   
+    @api.multi
+    def notify_secondpoapproval_for_approval(self):
+        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_above_1st_authorization')
+        user_ids = []
+        partner_ids = []
+        for user in group_id.users:
+            user_ids.append(user.id)
+            partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "RFQ {} needs your approval, Above Quota".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
     @api.multi
     def button_submit_legal(self):
