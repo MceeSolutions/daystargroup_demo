@@ -636,6 +636,8 @@ class PurchaseOrder(models.Model):
     need_first_management_approval = fields.Boolean(string="Management Approval 1")
     need_second_management_approval = fields.Boolean(string="Management Approval 2")
     
+    po_description = fields.Char('Purchase Order Description', track_visibility='onchange')
+    
     state = fields.Selection([
         ('draft', 'RFQ'),
         ('sent', 'RFQ Sent'),
@@ -684,7 +686,9 @@ class PurchaseOrder(models.Model):
            #     partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "RFQ '{}' needs approval".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        body = "RFQ '{}' needs approval.\
+        {} ".format(self.name, self.po_description)
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         return False
         return {}
     
@@ -2479,11 +2483,13 @@ class Picking(models.Model):
         type = self.env['stock.picking.type'].search([('code','=','outgoing')], limit=1)
         return type
     
+    '''
     @api.one
     @api.depends('site_code_id','site_code_id.project_id')
     def _get_analytic_account(self):
         if self.site_code_id.project_id.analytic_account_id:
             self.analytic_account_id = self.site_code_id.project_id.analytic_account_id.id
+    '''
     
     analytic_account_id = fields.Many2one(
         string='Analytic Account',

@@ -265,6 +265,9 @@
 		            	<field name="second_manager_approval_date"/>
 	            	</group>
             </field>
+            <field name="currency_id" position="after">
+            	<field name="po_description" required="1"/>
+            </field>
             <field name="company_id" position="after">
             	<field name="client_id" domain="[('customer','=',True)]" required="0"/>
             </field>
