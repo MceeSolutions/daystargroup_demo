@@ -686,8 +686,11 @@ class PurchaseOrder(models.Model):
            #     partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "RFQ '{}' needs approval".format(self.name)
-        body = "RFQ '{}' needs approval.\
-        {} ".format(self.name, self.po_description)
+        if self.po_description:
+            body = "RFQ '{}' needs approval.\
+        ' {}' ".format(self.name, self.po_description)
+        else:
+            body=subject
         self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         return False
         return {}
@@ -713,10 +716,15 @@ class PurchaseOrder(models.Model):
         self.line_manager_approval_date = date.today()
         self.line_manager_approval = self._uid
         subject = "RFQ {} has been approved by Line Manager".format(self.name)
+        if self.po_description:
+            body = "RFQ '{}' has been approved by Line Manager.\
+        '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         self.notify_procurement_for_approval()
     
     @api.multi
@@ -727,10 +735,15 @@ class PurchaseOrder(models.Model):
         self.po_manager_position = self._check_manager_position()
         self.button_request_finance_review()
         subject = "RFQ {} has been approved by Procurement".format(self.name)
+        if self.po_description:
+            body = "RFQ '{}' has been approved by Procurement.\
+            {} ".format(self.name, self.po_description)
+        else:
+            body=subject
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
     
     @api.multi
     def notify_procurement_for_approval(self):
@@ -742,7 +755,12 @@ class PurchaseOrder(models.Model):
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "RFQ {} needs approval from procurement".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        if self.po_description:
+            body = "RFQ '{}' needs approval from procurement.\
+            '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
     
     @api.depends('amount_total')
     def check_manager_approval_one(self):
@@ -756,7 +774,12 @@ class PurchaseOrder(models.Model):
                 partner_ids.append(user.partner_id.id)
             self.message_subscribe(partner_ids=partner_ids)
             subject = "RFQ {} needs your approval, Below Quota".format(self.name)
-            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+            if self.po_description:
+                body = "RFQ '{}' needs approval, Below Quota.\
+                '{}' ".format(self.name, self.po_description)
+            else:
+                body=subject
+            self.message_post(subject=subject,body=body,partner_ids=partner_ids)
             return False
         else:
             self.need_management_approval = False
@@ -774,7 +797,12 @@ class PurchaseOrder(models.Model):
                 partner_ids.append(user.partner_id.id)
             self.message_subscribe(partner_ids=partner_ids)
             subject = "RFQ {} needs your approval, Above Quota".format(self.name)
-            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+            if self.po_description:
+                body = "RFQ '{}' needs approval, Above Quota.\
+                '{}' ".format(self.name, self.po_description)
+            else:
+                body=subject
+            self.message_post(subject=subject,body=body,partner_ids=partner_ids)
             return False
         else:
             self.need_management_approval = False
@@ -789,7 +817,12 @@ class PurchaseOrder(models.Model):
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "RFQ {} needs your approval, Above Quota".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        if self.po_description:
+            body = "RFQ '{}' needs approval, Above Quota.\
+            '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
     
     @api.multi
     def button_submit_legal(self):
@@ -802,7 +835,12 @@ class PurchaseOrder(models.Model):
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "Purchase Order {} needs a review from legal team".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        if self.po_description:
+            body = "Purchase Order {} needs a review from legal team.\
+            '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         return False
     
     @api.multi
@@ -812,10 +850,15 @@ class PurchaseOrder(models.Model):
         self.finance_manager_approval = self._uid
         self.finance_manager_position = self._check_manager_position()
         subject = "Finance Review has been Done".format(self.name)
+        if self.po_description:
+            body = "Finance Review has been Done.\
+            '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         if self.amount_total < 100000.00:
             self.check_manager_approval_one()
         elif self.amount_total > 100000.00:
@@ -889,10 +932,15 @@ class PurchaseOrder(models.Model):
             if self.need_second_management_approval == False:
                 self.button_approve()
         subject = "RFQ {} has been approved".format(self.name)
+        if self.po_description:
+            body = "RFQ {}, '{}' has been approved.\
+             ".format(self.name, self.po_description)
+        else:
+            body=subject
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         self.need_first_management_approval = False
         
     @api.multi
@@ -903,10 +951,15 @@ class PurchaseOrder(models.Model):
             self.second_manager_position = self._check_manager_position()
             self.button_approve()
         subject = "RFQ {} has been approved".format(self.name)
+        if self.po_description:
+            body = "RFQ {}, '{}' has been approved.\
+             ".format(self.name, self.po_description)
+        else:
+            body=subject
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
     
     @api.multi
     def button_approve(self):
@@ -932,7 +985,12 @@ class PurchaseOrder(models.Model):
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "This RFQ '{}' needs review from Finance".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        if self.po_description:
+            body = "This RFQ '{}' needs review from Finance.\
+             '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         return {}
     
     @api.multi
@@ -947,17 +1005,27 @@ class PurchaseOrder(models.Model):
             partner_ids.append(user.partner_id.id)
         self.message_subscribe(partner_ids=partner_ids)
         subject = "This RFQ {} needs your attention".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        if self.po_description:
+            body = "This RFQ {} needs your attention.\
+             '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
         return {}
     
     @api.multi
     def button_finance_review_done(self):
         self.finance_review_done = True
         subject = "Finance review has been Done, Purchase Order {} can be confirmed now".format(self.name)
+        if self.po_description:
+            body = "Finance review has been Done, Purchase Order {} can be confirmed now.\
+             '{}' ".format(self.name, self.po_description)
+        else:
+            body=subject
         partner_ids = []
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        self.message_post(subject=subject,body=body,partner_ids=partner_ids)
     
     #NOT TO BE USED YET AND DO NOT DELETE THIS 
     """@api.multi
