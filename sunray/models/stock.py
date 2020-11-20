@@ -1497,12 +1497,12 @@ class SaleOrder(models.Model):
 #         order.write(val)
 #         return True
     
-    @api.multi
-    def action_cancel(self):
-        sub = self.env['sale.subscription'].search([('stage_id.name','=','In Progress'), ('partner_id', '=', self.partner_id.id), ('sale_order_id', '=', self.id)])
-        if sub:
-            sub.write({'stage_id': 4})
-        return self.write({'state': 'cancel'})
+    #@api.multi
+    #def action_cancel(self):
+    #    sub = self.env['sale.subscription'].search([('stage_id.name','=','In Progress'), ('partner_id', '=', self.partner_id.id), ('sale_order_id', '=', self.id)])
+    #    if sub:
+    #        sub.write({'stage_id': 4})
+    #    return self.write({'state': 'cancel'})
     
     @api.multi
     def _check_customer_registration(self):
@@ -1537,7 +1537,7 @@ class SaleOrder(models.Model):
         else:
             self.need_approval = False
             
-    
+    '''
     def _prepare_subscription_data(self, template):
         """Prepare a dictionnary of values to create a subscription from a template."""
         self.ensure_one()
@@ -1565,7 +1565,7 @@ class SaleOrder(models.Model):
         recurring_next_date = today + invoicing_period
         values['recurring_next_date'] = fields.Date.to_string(recurring_next_date)
         return values
-    
+    '''
 
 class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
@@ -1642,6 +1642,7 @@ class SaleOrderLine(models.Model):
         self.write({'project_id': project.id})
         return project
 
+'''
 class SaleSubscription(models.Model):
     _inherit = "sale.subscription"
     
@@ -1653,7 +1654,8 @@ class SaleSubscriptionLine(models.Model):
     site_code_id = fields.Many2one(comodel_name="site.code", string="Site Code")
     
     account_analytic_id = fields.Many2one(comodel_name='account.analytic.account', string="Analytic Account", copy=False)
-    
+'''
+   
 class SiteCode(models.Model):
     _name = "site.code"
     _description = "Site Code"

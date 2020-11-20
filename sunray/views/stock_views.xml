@@ -1000,6 +1000,7 @@
 	        </field>
 	</record>
 	
+	<!-- 
 	<record id="sunray_sale_subscription_view_form" model="ir.ui.view">
         <field name="name">sunray.sale.subscription.form</field>
 	        <field name="model">sale.subscription</field>
@@ -1014,7 +1015,8 @@
 	            </xpath>
 	        </field>
 	</record>
-	
+	 -->
+	 
 	<record id="sunray_view_account_analytic_account_form" model="ir.ui.view">
         <field name="name">sunray.account.analytic.account.form</field>
 	        <field name="model">account.analytic.account</field>
