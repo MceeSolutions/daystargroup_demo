@@ -3459,7 +3459,7 @@ class MrpProduction(models.Model):
         
         return res
     
-    
+'''    
 class Repair(models.Model):
     _inherit = 'repair.order'
     
@@ -3489,6 +3489,7 @@ class RepairLine(models.Model):
     _inherit = 'repair.line'
         
     site_code_id = fields.Many2one(comodel_name="site.code", string="Site Code")
+
 
 class MaintenanceRequest(models.Model):
     _inherit = 'maintenance.request'
@@ -3539,6 +3540,7 @@ class MaintenanceRequest(models.Model):
         }
         
         return res
+'''
 
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'

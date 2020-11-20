@@ -1070,6 +1070,7 @@
 	        </field>
 	</record>
 	
+	<!-- 
 	<record id="sunray_maintenance_hr_equipment_request_view_form" model="ir.ui.view">
         <field name="name">sunray.equipment.request.form</field>
 	        <field name="model">maintenance.request</field>
@@ -1087,7 +1088,7 @@
 		        </field>
 	        </field>
 	</record>
-	
+	 
 	<record id="sunray_view_repair_order_form" model="ir.ui.view">
         <field name="name">sunray.repair.order.form</field>
 	        <field name="model">repair.order</field>
@@ -1101,7 +1102,8 @@
 	            </xpath>
 	        </field>
 	</record>
-	
+	 -->
+	 
 	<record id="sunray_account_asset_view_account_asset_asset_form" model="ir.ui.view">
         <field name="name">sunray.account.asset.asset.form</field>
 	        <field name="model">account.asset.asset</field>
