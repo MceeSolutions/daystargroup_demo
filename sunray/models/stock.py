@@ -654,11 +654,20 @@ class PurchaseOrder(models.Model):
     stock_source = fields.Char(string='Source document')
     store_request_id = fields.Many2one('stock.picking','Store Request', readonly=True, track_visibility='onchange')
     
+    active = fields.Boolean(string='Active', default=True)
+    
     @api.model
     def create(self, vals):
         result = super(PurchaseOrder, self).create(vals)
         result.send_store_request_mail()
         return result
+    
+    @api.constrains('name')
+    def check_code(self):
+        if self.name:
+            if self.search([('name','=',self.name),('id','!=',self.id)]):
+                self.env['ir.sequence']._check_po_sequence()
+                return Warning('Number must be unique!')
     
     @api.multi
     def send_store_request_mail(self):
