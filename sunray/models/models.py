@@ -300,7 +300,6 @@ class Lead(models.Model):
         view_ref = self.env['ir.model.data'].get_object_reference('mrp', 'mrp_production_form_view')
         view_id = view_ref[1] if view_ref else False
         
-        #purchase_line_obj = self.env['purchase.order.line']
         '''for subscription in self:
             order_lines = []
             for line in subscription.move_lines:
@@ -1718,7 +1717,6 @@ class AvailabilityRequest(models.Model):
         view_ref = self.env['ir.model.data'].get_object_reference('purchase', 'purchase_order_form')
         view_id = view_ref[1] if view_ref else False
         
-        #purchase_line_obj = self.env['purchase.order.line']
         for subscription in self:
             order_lines = []
             for line in subscription.request_move_line:
@@ -1760,7 +1758,6 @@ class AvailabilityRequest(models.Model):
         view_ref = self.env['ir.model.data'].get_object_reference('sunray', 'sunray_stock_form_view')
         view_id = view_ref[1] if view_ref else False
         
-        #purchase_line_obj = self.env['purchase.order.line']
         for subscription in self:
             order_lines = []
             for line in subscription.request_move_line:

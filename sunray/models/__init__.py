@@ -2,3 +2,4 @@
 
 from . import models
 from . import stock
+from . import purchase

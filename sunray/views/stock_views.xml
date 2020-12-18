@@ -55,9 +55,6 @@
 	    <field name="model">purchase.requisition</field>
 	    <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
 	    <field name="arch" type="xml">
-	    	<!--  <field name="vendor_id" position="after">
-	    		<field name="employee_id"/>
-	    	</field>-->
 	    	<field name="vendor_id" position="after">
 	    		<field name="type_of_request" groups="purchase.group_purchase_manager"/>
 	    	</field>
@@ -175,7 +172,6 @@
         	<xpath expr="//button[@name='action_rfq_send']" position="before">
         		<button name="button_submit" string="Submit to Manager" type="object" states="draft"  groups="base.group_user"/>
         		<button name="button_inform_budget_owner" string="Inform Budget Owner" type="object" attrs="{'invisible': ['|', ('state', '=', 'purchase'), ('inform_budget_owner', '=', True)]}" groups="base.group_user"/>
-        		<!-- <button name="button_request_finance_review" string="Request Finance Review" type="object" attrs="{'invisible': ['|', ('state', '=', 'purchase'), ('need_finance_review', '=', True)]}" groups="base.group_user"/> -->
         		<button name="button_finance_reviewd" string="Finance Review Done" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|', ('state', '=', 'purchase'), ('need_finance_review', '=', False), ('need_finance_review_done', '=', True)]}" groups="sunray.group_po_finance"/>
         	</xpath>
         	
@@ -234,10 +230,6 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='analytic_tag_ids']" position="replace">
             	<field name="analytic_tag_ids" invisible = "1" widget="many2many_tags" options="{'color_field': 'color'}"/>
             </xpath>
-            <field name="partner_id" position="after">
-<!--             	<field name="parent_po"/>	
-            	<field name="project_id"/> -->
-            </field>
             <field name="order_line" position="after">
            			<group string = "Requested By" col="4" colspan="6">
 		            	<field name="employee_id" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager" required="1"/>
