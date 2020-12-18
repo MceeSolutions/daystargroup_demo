@@ -109,11 +109,11 @@ class PurchaseOrder(models.Model):
     state = fields.Selection([
         ('draft', 'RFQ'),
         ('sent', 'RFQ Sent'),
-        ('to approve', 'To Approve'),
-        ('submit', ' Line Manager Approval'),
-        ('management', 'Management Approval'),
-        ('legal', 'Awaiting Legal Review'),
-        ('legal_reviewed', 'Reviewed'),
+        ('submit', 'Manager To Approve'),
+        ('manager_approve', 'Procurement To Approve'),
+        ('procurement_approve', 'CFO To Approve'),
+        ('cfo_approve', 'COO To Approve'),
+        ('coo_approve', 'CEO To Approve'),
         ('purchase', 'Purchase Order'),
         ('done', 'Locked'),
         ('cancel', 'Cancelled')
@@ -155,7 +155,7 @@ class PurchaseOrder(models.Model):
                     
     @api.multi
     def action_line_manager_approval(self):
-        self.write({'state':'to approve'})
+        self.write({'state':'manager_approve'})
         self.line_manager_approval_date = date.today()
         self.line_manager_approval = self._uid
         subject = "RFQ {} has been approved by Line Manager".format(self.name)
@@ -324,9 +324,9 @@ class PurchaseOrder(models.Model):
                     #or order.user_has_groups('purchase.group_purchase_manager'):
                 #order.button_approve()
                 print("don't confirm po even with po manager access")
-                order.write({'state': 'to approve'})
+                order.write({'state': 'manager_approve'})
             else:
-                order.write({'state': 'to approve'})
+                order.write({'state': 'manager_approve'})
         return True
     
     @api.multi
