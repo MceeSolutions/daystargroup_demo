@@ -1855,8 +1855,8 @@ class Picking(models.Model):
     @api.one
     @api.depends('site_code_id','site_code_id.project_id')
     def _get_analytic_account(self):
-        if self.site_code_id.project_id.analytic_account_id:
-            self.analytic_account_id = self.site_code_id.project_id.analytic_account_id.id
+        if self.site_code_id.project_id.account_analytic_id:
+            self.analytic_account_id = self.site_code_id.project_id.account_analytic_id.id
     
     analytic_account_id = fields.Many2one(
         string='Analytic Account',

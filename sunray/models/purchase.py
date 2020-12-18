@@ -194,7 +194,7 @@ class PurchaseOrder(models.Model):
     def check_manager_approval_one(self):
         company_currency = self.company_id.currency_id
         current_currency = self.currency_id
-        self.need_management_approval = 
+        # self.need_management_approval = 
         if self.amount_total < 100000.00:
             self.need_first_management_approval = True
             group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_below_1st_authorization')
