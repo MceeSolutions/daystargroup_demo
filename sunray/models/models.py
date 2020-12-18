@@ -19,311 +19,6 @@ class CountryState(models.Model):
     
     region = fields.Char(string='Region')
     
-class Lead(models.Model):
-    _name = "crm.lead"
-    _inherit = 'crm.lead'
-    
-    type_of_offer = fields.Selection([('saas', 'SaaS'), ('pass', 'PaaS'),('battery', 'Battery'),
-                                      ('pass_diesel', 'PaaS Diesel'),('lease', 'Lease to'), ('own', 'Own'),
-                                      ('sale', 'Sale')], string='Type of Offer', required=False,default='saas')
-    size = fields.Float(string='Size (kWp)')
-    
-    state = fields.Selection([
-        ('draft', 'Draft'),
-        ('submit', 'Submitted'),
-        ('approve', 'Approved'),
-        ('reject', 'Rejected'),
-        ], string='Status', readonly=True, index=True, copy=False, default='draft', track_visibility='onchange')
-    
-    budget = fields.Float(string='Estimate project costs')
-    legal_review = fields.Boolean(string='Legal Review')
-    legal_review_done = fields.Boolean(string='Legal Review Done')
-    
-    site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', domain=[('country_id.name','=','Nigeria')])
-    
-    #site_location_id = fields.Char(string='Site Location')
-    #default_site_code = fields.Char(string='Site Code') 
-    #default_site_code = fields.Char(string='Site Code')
-    
-    client_type = fields.Many2one(comodel_name='customer.type', related='partner_id.customer_type_id', string='Customer Type')
-    site_area = fields.Char(string='Site Area', related='site_code_id.site_area')
-    site_address = fields.Char(string='Site Address')
-    site_type = fields.Char(string='Site Type')
-    #site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site location', track_visibility='onchange')
-    region = fields.Char(string='Region', related='site_location_id.region')
-    country_id = fields.Many2one(comodel_name='res.country', string="Country")
-    #project_status = fields.Char(string='Status.')
-    contract_duration = fields.Float(string='Contract Duration (year)')
-    coordinates = fields.Char(string='Coordinates')
-    
-    type_of_offer = fields.Selection([('lease_to_own', 'Lease to own'), ('pass_battery', 'PaaS Battery'), 
-                                      ('pass_diesel', 'PaaS Diesel'), ('solar', 'Solar Only'),('saas', 'SaaS'), ('sale', 'Sale')], string='Service Type', required=False,default='saas')
-    #atm_power_at_night = fields.Selection([('yes', 'Yes'), ('no', 'No'),], string='Does the system power ATM night/we?', required=False,default='yes')
-    
-    tariff_per_kwp = fields.Float(string='Tariff per kWh')
-    
-    #currency_id = fields.Many2one(comodel_name='res.currency', string='Currency.')
-    monthly_service_fees = fields.Float(string='Monthly Service fees')
-    #lease_duration = fields.Char(string='If lease, contract duration')
-    sales_price = fields.Float(string="Sale Revenue")
-    
-    lead_approval = fields.Boolean(string="lead approval", related='company_id.company_lead_approval')
-    site_location_id = fields.Many2one(comodel_name='res.country.state', string='Site Location', related='site_code_id.state_id', domain=[('country_id.name','=','Nigeria')])
-    
-    request_site_code = fields.Boolean(string="Request Site Code", copy=False)
-    
-    site_code_id = fields.Many2one(comodel_name="site.code", string="Site Code")
-    #site_code_ids = fields.Many2many(comodel_name="site.code", string="Site Code(s)")
-    #new_currency_id = fields.Many2one(comodel_name="res.currency", string='Stored Currency', default=lambda self: self.env.user.company_id.currency_id.id, store=True)
-    total_capacity = fields.Float(string='Total Capacity (kWp)')
-    solar_capacity = fields.Float(string='Solar Capacity (kWp)')
-    
-    opportunity_created_date = fields.Datetime(string="Opportunity Creation Date")
-    
-    nord_type_of_sales = fields.Selection([('tendering', 'Tendering'), ('regular', 'Regular')], string='Type of Sales')
-    nord_type_of_offer = fields.Selection([('asset_mang', 'Asset Management'), ('sales_of_drill', 'Sales of drilling fluids and chemicals'), ('sales_of_tools', 'Sales of tools and equipment')], string='Type of Offer')
-    nord_size = fields.Char(string='Size.')
-    
-    private_lead = fields.Boolean(string="private lead")
-    
-    site_code_request_id = fields.Many2one('site.code.request', string='Request Site Code', index=True, track_visibility='onchange')
-    
-    project_id = fields.Many2one(comodel_name='project.project', string='Project', required=False)
-    
-    '''
-    @api.multi
-    def generate_site_code(self, vals):
-        site = self.env['res.country.state'].search([('id','=',vals['site_location_id'])])
-        client = self.env['res.partner'].search([('id','=',vals['partner_id'])])
-        if site and client:
-            code = client.parent_account_number + "_" +  site.code
-            
-            no = self.env['ir.sequence'].next_by_code('project.site.code')
-            site_code = code + "_" +  str(no)
-            vals['default_site_code'] = site_code
-    '''
-    
-    '''
-    @api.onchange('create_date')
-    def _onchange_opportunity_create_date(self):
-        self.opportunity_created_date = self.create_date
-    '''
-            
-    @api.multi
-    def create_project_from_lead(self):
-        #if self.stage_id.id == 29:
-        project_line = self.env['project.project'].create({
-            'crm_lead_id': self.id,
-            'name': self.site_code_id.name,
-            'partner_id': self.partner_id.id,
-            'site_code_id': self.site_code_id.id,
-            'site_area': self.site_area,
-            'site_address': self.site_address,
-            'site_type': self.site_type,
-            'country_id': self.country_id.id,
-            'lease_duration': self.contract_duration,
-            'coordinates': self.coordinates,
-            'type_of_offer': self.type_of_offer,
-            'tariff_per_kwp': self.tariff_per_kwp,
-            'site_location_id': self.site_location_id.id,
-            'total_capacity': self.total_capacity,
-            'solar_capacity': self.solar_capacity,
-            'sales_price': self.sales_price
-            })
-        self.project_id = project_line
-        return {}
-    
-    @api.multi
-    def action_set_won_rainbowman(self):
-        self.ensure_one()
-        self.action_set_won()
-        self.create_project_from_lead()
-    
-    @api.multi
-    def button_reset(self):
-        self.write({'state': 'draft'})
-        return {}
-    
-    @api.multi
-    def button_request_site_code(self):
-        self.request_site_code = True
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_site_code_creation')
-        user_ids = []
-        partner_ids = []
-        for user in group_id.users:
-            user_ids.append(user.id)
-            partner_ids.append(user.partner_id.id)
-        self.message_subscribe(partner_ids=partner_ids)
-        subject = "A site code is needed for this '{}' oppurtunity for customer '{}', Site Location '{}' and Site Area '{}' ".format(self.name, self.site_code_request_id.partner_id.name, self.site_code_request_id.state_id.name, self.site_code_request_id.area)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        return False
-        return {}
-    
-    @api.multi
-    def button_submit(self):
-        self.write({'state': 'submit'})
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager')
-        user_ids = []
-        partner_ids = []
-        for user in group_id.users:
-            user_ids.append(user.id)
-            partner_ids.append(user.partner_id.id)
-        self.message_subscribe(partner_ids=partner_ids)
-        subject = "Created Lead {} is ready for Approval".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        return False
-        return {}
-    
-    @api.multi
-    def button_approve(self):
-        self.write({'state': 'approve'})
-        self.active = True
-        self.send_introductory_mail()
-        subject = "Created Lead {} has been approved".format(self.name)
-        partner_ids = []
-        for partner in self.message_partner_ids:
-            partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        return {}
-    
-    @api.multi
-    def button_reject(self):
-        self.write({'state': 'reject'})
-        return {}
-    
-    @api.model
-    def create(self, vals):
-        result = super(Lead, self).create(vals)
-        result.send_introductory_mail()
-        result.opportunity_created_date = result.create_date
-        return result
-    
-    @api.multi
-    def check_lead_approval(self):
-        if self.company_id.company_lead_approval == True:
-            self.active = False
-        else:
-            self.send_introductory_mail()
-    
-    @api.multi
-    def button_submit_legal(self):
-        self.legal_review = True
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_legal_team')
-        user_ids = []
-        partner_ids = []
-        for user in group_id.users:
-            user_ids.append(user.id)
-            partner_ids.append(user.partner_id.id)
-        self.message_subscribe(partner_ids=partner_ids)
-        subject = "Opportunity '{}' needs a review from the legal team".format(self.name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        return False
-    
-    @api.multi
-    def button_submit_legal_done(self):
-        self.legal_review_done = True
-        subject = "Opportunity {} has been reviewed by the legal team".format(self.name)
-        partner_ids = []
-        for partner in self.message_partner_ids:
-            partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-    
-    @api.multi
-    def send_introductory_mail(self):
-        config = self.env['mail.template'].sudo().search([('name','=','Introductory Email Template')], limit=1)
-        mail_obj = self.env['mail.mail']
-        if config:
-            values = config.generate_email(self.id)
-            mail = mail_obj.create(values)
-            if mail:
-                mail.send()
-                subject = "Introductory message for {} has been sent to client".format(self.name)
-                partner_ids = []
-                for partner in self.sheet_id.message_partner_ids:
-                    partner_ids.append(partner.id)
-                self.sheet_id.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-                
-    
-    @api.multi
-    def send_site_audit_request_mail(self):
-        config = self.env['mail.template'].sudo().search([('name','=','Site Audit Request Template')], limit=1)
-        mail_obj = self.env['mail.mail']
-        if config:
-            values = config.generate_email(self.id)
-            mail = mail_obj.create(values)
-            if mail:
-                mail.send()
-                subject = "Site audit request {} has been sent to client".format(self.name)
-                partner_ids = []
-                for partner in self.message_partner_ids:
-                    partner_ids.append(partner.id)
-                self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-    
-    @api.multi
-    def create_project(self):
-        """
-        Method to open create project form
-        """
-        #self.generate_site_code(vals)
-        partner_id = self.partner_id
-        site_location_id = self.site_location_id
-        default_site_code = self.default_site_code
-             
-        view_ref = self.env['ir.model.data'].get_object_reference('project', 'edit_project')
-        view_id = view_ref[1] if view_ref else False
-         
-        res = {
-            'type': 'ir.actions.act_window',
-            'name': ('Project'),
-            'res_model': 'project.project',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': view_id,
-            'target': 'current',
-            'context': {'default_partner_id': partner_id.id, 'default_name': self.name, 'default_site_location_id': self.site_location_id.id, 'default_default_site_code': self.default_site_code,  'default_crm_lead_id': self.id}
-        }
-        
-        return res
-    
-    @api.multi
-    def create_manufacturing_order(self):
-        """
-        Method to open create purchase agreement form
-        """
-
-        partner_id = self.partner_id
-        #client_id = self.client_id
-        #store_request_id = self.id
-        #sub_account_id = self.sub_account_id
-        #product_id = self.move_lines.product_id
-             
-        view_ref = self.env['ir.model.data'].get_object_reference('mrp', 'mrp_production_form_view')
-        view_id = view_ref[1] if view_ref else False
-        
-        '''for subscription in self:
-            order_lines = []
-            for line in subscription.move_lines:
-                order_lines.append((0, 0, {
-                    'product_uom_id': line.product_id.uom_id.id,
-                    'product_id': line.product_id.id,
-                    'account_analytic_id': 1,
-                    'product_qty': line.product_uom_qty,
-                    'schedule_date': date.today(),
-                    'price_unit': line.product_id.standard_price,
-                }))
-        ''' 
-        res = {
-            'type': 'ir.actions.act_window',
-            'name': ('Manufacturing Order'),
-            'res_model': 'mrp.production',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': view_id,
-            'target': 'current',
-            'context': {'default_origin': self.name}
-        }
-        
-        return res
 
 class SiteCodeRequest(models.Model):
     _name = "site.code.request"
@@ -367,19 +62,9 @@ class SiteCodeRequested(models.TransientModel):
         leads = self.env['crm.lead'].browse(self.env.context.get('active_ids'))
         leads.write({'site_code_request_id': self.site_code_request_id.id})
         leads.button_request_site_code()
-        #return leads.button_reset()
 
-class Stage(models.Model):
-    _name = "crm.stage"
-    _inherit = "crm.stage"
-    
-    company_id = fields.Many2one('res.company', string='Company', store=True,
-        default=lambda self: self.env.user.company_id, track_visibility='onchange')
-    
-    active = fields.Boolean(string='Active')
     
 class SubAccount(models.Model):
-        
     _name = "sub.account"
     _description = "sub account form"
     _order = "parent_id"
@@ -404,47 +89,24 @@ class SubAccount(models.Model):
     def _compute_company_type(self):
         for partner in self:
             partner.company_type = 'company' if partner.is_company else 'person'
-            
-#     def _createSub(self):
-#         partner_ids = self.search([('parent_id','=',self.parent_id.id)])
-#         number = len(partner_ids) + 1
-#         number = "SA00" + str(number)
-#         return number
 
     name = fields.Char(index=True, track_visibility='onchange')
-    
     parent_id = fields.Many2one('res.partner', string='Customer', domain="[('customer','=',True)]", index=True, ondelete='cascade', track_visibility='onchange')
-        
     function = fields.Char(string='Description')
-    
     comment = fields.Text(string='Desription')
-    
     addinfo = fields.Text(string='Additional Information')
-    
     child_account = fields.Char(string='Child Account Number', index=True, copy=False, default='/', track_visibility='onchange')
-    
     website = fields.Char(help="Website of Partner or Company")
-    
     employee = fields.Boolean(help="Check this box if this contact is an Employee.")
-    
     fax = fields.Char(help="fax")
-    
     create_date = fields.Date(string='Create Date', readonly=True, track_visibility='onchange')
-    
     activation_date = fields.Date(string='Activation Date', readonly=False, track_visibility='onchange')
-    
     term_date = fields.Date(string='Termination Date', track_visibility='onchange')
-    
     perm_up_date = fields.Date(string='Permanent Activation Date', readonly=False, track_visibility='onchange')
-    
     price_review_date = fields.Date(string='Price Review Date', readonly=False, track_visibility='onchange')
-    
     contact_person = fields.Many2one('res.partner.title')
-    
     company_name = fields.Many2many('Company Name')
-    
     employee = fields.Boolean(help="Check this box if this contact is an Employee.")
-      
     type = fields.Selection(
         [('contact', 'Contact'),
          ('invoice', 'Invoice address'),
@@ -459,18 +121,14 @@ class SubAccount(models.Model):
     state_id = fields.Many2one("res.country.state", string='State', ondelete='restrict')
     country_id = fields.Many2one('res.country', string='Country', ondelete='restrict')
     email = fields.Char()
-    
     phone = fields.Char()
     mobile = fields.Char()
-    
     company_type = fields.Selection(string='Company Type',
         selection=[('person', 'Individual'), ('company', 'Company')],
         compute='_compute_company_type', inverse='_write_company_type')
     company_id = fields.Many2one('res.company', 'Company', index=True, default=_default_company)
-    
     contact_address = fields.Char(compute='_compute_contact_address', string='Complete Address')
     company_name = fields.Char('Company Name') 
-    
     state = fields.Selection([
         ('new', 'Waiting Approval'),
         ('approve', 'Approved'),
@@ -539,36 +197,7 @@ class SubAccount(models.Model):
         self.write({'state': 'reject'})
         return {}
 
-class HelpdeskTicket(models.Model):
-    _inherit = "helpdesk.ticket"
-    _description = 'Ticket'
-    
-    project_id = fields.Many2one(comodel_name='project.project', string='Project')
-    project_site_code_id = fields.Many2one(comodel_name='site.code', string='Site Code', related='project_id.site_code_id', store = True)
-    
-    stage_name = fields.Char(string='Stage Name', related='stage_id.name', store = True)
-    
-    @api.onchange('stage_id')
-    def _check_security_action_validate(self):
-        #current_employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
-        if self.stage_id.name == 'Solved':
-            if not self.env.user.has_group('sunray.group_noc_team'):
-                raise UserError(_('Only members of the Noc Team are allowed to close tickets.'))
-    
-    @api.multi
-    def button_request_closure(self):
-        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_noc_team')
-        user_ids = []
-        partner_ids = []
-        for user in group_id.users:
-            user_ids.append(user.id)
-            partner_ids.append(user.partner_id.id)
-        self.message_subscribe(partner_ids=partner_ids)
-        subject = "This Ticket '{}' is ready for closure".format(self.display_name)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        return {}
-    
-    
+
     
 class ItemType(models.Model):
     
@@ -600,7 +229,6 @@ class BrandType(models.Model):
         return [x for x in range(lst[0], lst[-1]+2)  
                            if x not in lst] 
 
-    
     def _default_code(self):
         code  = [int(a.code[1:]) for a in self.search([(1,'=',1)])]
         if code ==[]:
@@ -616,30 +244,6 @@ class BrandType(models.Model):
     code = fields.Char('Code', required=True, default=_default_code, track_visibility='onchange')
     active = fields.Boolean('Active', default='True')
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
-    
-    business_unit = fields.Char(string='Business Unit')
-    manufacturer = fields.Char(string='Manufacturer')
-    dimension = fields.Char(string='Dimension (mm) (W x D x H)')
-    manufacturer_part_number = fields.Char(string='Manufacturer part number')
-    
-    brand = fields.Many2one('brand.type', string='Manufacturer', track_visibility='onchange', index=True)
-    item_type = fields.Many2one('item.type', string='Item Type', track_visibility='onchange', index=True)
-    
-    '''
-    @api.model
-    def create(self, vals):
-        brand = self.env['brand.type'].search([('id','=',vals['brand'])])
-        item = self.env['item.type'].search([('id','=',vals['item_type'])])
-        if brand and item:
-            code = brand.code + item.code
-        
-            no = self.env['ir.sequence'].next_by_code('product.template')
-            item_code = code + str(no)
-            vals['default_code'] = item_code
-        return super(ProductTemplate, self).create(vals)
-    '''
 
 class PensionManager(models.Model):
     _name = 'pen.type'
