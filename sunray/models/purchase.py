@@ -12,7 +12,8 @@ class PurchaseOrder(models.Model):
         
     @api.onchange('requisition_id')
     def _onchange_requisition_id(self):
-        self.employee_id = self.requisition_id.employee_id
+        if self.requisition_id:
+            self.employee_id = self.requisition_id.employee_id
     
     @api.multi
     def _check_line_manager(self):
