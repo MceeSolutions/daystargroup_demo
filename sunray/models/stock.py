@@ -3074,6 +3074,12 @@ class AccountAnalyticAccount(models.Model):
     
     department_id = fields.Many2one(comodel_name='hr.department', string='Department')
     
+    @api.constrains('name')
+    def check_analytic_name(self):
+        if self.name:
+            if self.search([('name','=',self.name),('id','!=',self.id)]):
+                return Warning('Analytic Account must be unique!')
+    
     '''
     @api.multi
     def name_get(self):
