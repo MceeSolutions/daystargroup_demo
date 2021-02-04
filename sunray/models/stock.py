@@ -2593,6 +2593,7 @@ class Picking(models.Model):
              " * Cancelled: has been cancelled, can't be confirmed anymore.")
     
     inventory_validation = fields.Boolean(string='inventory validation')
+    date_done = fields.Datetime('Effective Date', copy=False, readonly=True, help="Date at which the transfer has been processed or cancelled.")
     
     @api.multi
     def button_submit(self):
