@@ -2,7 +2,7 @@
   <data>
   	
   	<record id="sunray_res_config_settings_view_form" model="ir.ui.view">
-            <field name="name">sunray.res.config.settings.view.form.inherit.crm</field>
+            <field name="name">sunray.expense.res.config.settings.view.form.inherit.crm</field>
             <field name="model">res.config.settings</field>
             <field name="priority" eval="40"/>
             <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
@@ -23,7 +23,32 @@
 	            </xpath>	         
            </field>
    	</record>
-   	
+	
+	<record id="sunray_hr_expenses_res_config_settings_view_form" model="ir.ui.view">
+	     <field name="name">sunray.res.config.settings.view.form.inherit.hr.expense</field>
+         <field name="model">res.config.settings</field>
+         <field name="priority" eval="5"/>
+	     <field name="inherit_id" ref="hr_expense.res_config_settings_view_form"/>
+	     <field name="arch" type="xml">
+	     <xpath expr="//div[@data-key='hr_expense']/div" position="inside">
+	     	<div class="col-12 col-lg-6 o_setting_box">
+	        	<div class="o_setting_right_pane">
+	            	<label for="expense_account_ids"/>
+	                <span class="fa fa-lg fa-globe" title="Expense Account(s) to be set for company." groups="hr_expense.group_hr_expense_manager"/>
+	                <div class="text-muted">
+                      Expense Account(s) to be used for set company
+	                 </div>
+	                 <div class="content-group">
+                     	<div class="mt16">
+                          <field name="expense_account_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
+	                     </div>
+	                  </div>
+	              </div>
+	          </div>
+	      </xpath>	         
+	    </field>
+   	</record>
+	   	
    	<record model="ir.actions.act_window" id="purchase_requisition.action_purchase_requisition">
         <field name="name">Procurement Requests</field>
         <field name="type">ir.actions.act_window</field>
@@ -1470,6 +1495,31 @@
             	</xpath>
             </field>
     </record>
+	
+	<record id="sunray_hr_expense_form_view_inherit_sale_expense" model="ir.ui.view">
+       	<field name="name">sunray.sale.hr.expense</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="sale_expense.hr_expense_form_view_inherit_sale_expense"/>
+        <field name="arch" type="xml">
+           	<field name="sale_order_id" position="replace">
+			  	<field name="sale_order_id" context="{'sale_show_partner_name': True}" groups="sales_team.group_sale_salesman" invisible="1"/>
+			</field>
+        </field>
+	</record>
+	
+	<record id="sunray_hr_expense_view_form" model="ir.ui.view">
+       	<field name="name">sunray.hr.expense</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+        <field name="arch" type="xml">
+        	<field name="product_id" position="replace">
+			  	<field name="product_id" context="{'default_can_be_expensed': 1, 'tree_view_ref': 'hr_expense.product_product_expense_tree_view'}" invisible="0"/>
+           	</field>
+        	<field name="account_id" position="replace">
+			  	<field name="account_id" groups="account.group_account_user"/>
+			</field>
+        </field>
+	</record>
 	
 	<!-- Hr Payslip Form -->
 	<record id="sunray_view_hr_payslip_form" model="ir.ui.view">

@@ -35,6 +35,24 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
     
     lead_approval = fields.Boolean(string='Lead Approval', company_dependent=False, readonly=False, related='company_id.company_lead_approval')
+    
+    expense_account_ids = fields.Many2many('account.account', string='Expense Account(s)', ondelete="cascade")
+    
+    @api.multi
+    def set_values(self):
+        res = super(ResConfigSettings, self).set_values()
+        self.env['ir.config_parameter'].sudo().set_param('sunray.expense_account_ids', self.expense_account_ids.ids)
+        return res
+    
+    @api.model
+    def get_values(self):
+        res = super(ResConfigSettings, self).get_values()
+        with_user = self.env['ir.config_parameter'].sudo()
+        com_vehicles = with_user.get_param('sunray.expense_account_ids')
+        res.update(
+            expense_account_ids=[(6, 0, literal_eval(com_vehicles))] if com_vehicles else False,
+            )
+        return res
 
 class IrSequence(models.Model):
     _inherit = 'ir.sequence'
@@ -338,6 +356,24 @@ class HrExpense(models.Model):
     _name = "hr.expense"
     _inherit = "hr.expense"
     
+    @api.model
+    def _default_account_id(self):
+        return self.env['ir.property'].get('property_account_expense_categ_id', 'product.category')
+    
+    @api.model
+    def _default_product_id(self):
+        return self.env['product.product'].search([('default_code', '=', 'EXP_GEN')], limit=1)
+    
+    @api.model
+    def _get_account_id_domain(self):
+        values = self.env['ir.config_parameter'].sudo().get_param('sunray.expense_account_ids')
+        domain_list = literal_eval(values)
+        res = [('id', 'in', domain_list), ('internal_type', '=', 'other')]
+        return res
+    
+    product_id = fields.Many2one('product.product', string='Product', readonly=True, states={'draft': [('readonly', False)], 'reported': [('readonly', False)], 'refused': [('readonly', False)]}, domain=[('can_be_expensed', '=', True)], default=_default_product_id, required=True)
+    
+    account_id = fields.Many2one('account.account', string='Account', states={'post': [('readonly', True)], 'done': [('readonly', True)]}, domain=lambda self: self._get_account_id_domain(), help="An expense account is expected.")
     
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', states={'post': [('readonly', True)], 'done': [('readonly', True)]}, oldname='analytic_account', required=True)
     
@@ -2572,7 +2608,7 @@ class Picking(models.Model):
     
     analytic_account_id = fields.Many2one(
         string='Analytic Account',
-        comodel_name='account.analytic.account', compute='_get_analytic_account', store=True 
+        comodel_name='account.analytic.account', store=True 
     )
     state = fields.Selection([
         ('draft', 'Draft'),
