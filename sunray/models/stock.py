@@ -376,7 +376,7 @@ class HrExpense(models.Model):
     
     product_id = fields.Many2one('product.product', string='Product', readonly=True, states={'draft': [('readonly', False)], 'reported': [('readonly', False)], 'refused': [('readonly', False)]}, domain=[('can_be_expensed', '=', True)], default=_default_product_id, required=True)
     
-    account_id = fields.Many2one('account.account', string='Account', states={'post': [('readonly', True)], 'done': [('readonly', True)]}, domain=lambda self: self._get_account_id_domain(), help="An expense account is expected.")
+    account_id = fields.Many2one('account.account', string='Account', states={'post': [('readonly', True)], 'done': [('readonly', True)]}, domain=lambda self: self._get_account_id_domain(), help="An expense account is expected")
     
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', states={'post': [('readonly', True)], 'done': [('readonly', True)]}, oldname='analytic_account', required=True)
     
