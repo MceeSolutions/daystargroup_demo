@@ -367,9 +367,12 @@ class HrExpense(models.Model):
     @api.model
     def _get_account_id_domain(self):
         values = self.env['ir.config_parameter'].sudo().get_param('sunray.expense_account_ids')
-        domain_list = literal_eval(values)
-        res = [('id', 'in', domain_list), ('internal_type', '=', 'other')]
-        return res
+        if values:
+            domain_list = literal_eval(values)
+            res = [('id', 'in', domain_list), ('internal_type', '=', 'other')]
+            return res
+        else:
+            return False
     
     product_id = fields.Many2one('product.product', string='Product', readonly=True, states={'draft': [('readonly', False)], 'reported': [('readonly', False)], 'refused': [('readonly', False)]}, domain=[('can_be_expensed', '=', True)], default=_default_product_id, required=True)
     
