@@ -194,21 +194,6 @@ class PurchaseOrder(models.Model):
             'state': state
         })
 
-    # @api.multi
-    # def action_first_manager_approval(self):
-    #     if self.need_first_management_approval == True: 
-    #         self.approval_date = date.today()
-    #         self.manager_approval = self._uid
-    #         self.manager_position = self._check_manager_position()
-    #         if self.need_second_management_approval == False:
-    #             self.button_approve()
-    #     subject = "RFQ {} has been approved".format(self.name)
-    #     partner_ids = []
-    #     for partner in self.message_partner_ids:
-    #         partner_ids.append(partner.id)
-    #     self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-    #     self.need_first_management_approval = False
-
     @api.multi
     def action_ceo_approval(self):
         # Send to coo for approval
