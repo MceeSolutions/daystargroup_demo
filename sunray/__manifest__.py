@@ -24,21 +24,23 @@
         'purchase',
         'helpdesk',
         'stock',
-        'sale_subscription',
         'product',
         'account_budget',
         'purchase_requisition',
         'mrp',
-        'mrp_maintenance'
+        'mrp_maintenance',
+        'sale_subscription',
+        'stock_barcode',
     ],
     'data': [
         'security/sunray_security.xml',
         'security/ir.model.access.csv',
         'data/data.xml',
-        'views/views.xml',
-        'views/stock_views.xml',
-        'views/vendor_request_info_template.xml',
-        'views/purchase_view.xml',
+        # 'views/stock_views.xml',
+        # 'views/vendor_request_info_template.xml',
+        # 'views/purchase_view.xml',
+        'views/'
+
     ],
     'qweb': [
         'views/chatter.xml'
