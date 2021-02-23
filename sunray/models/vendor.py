@@ -302,7 +302,7 @@ class VendorRequest(models.Model):
             self.customer = True
             if self.potential_partner_id:
                 self.potential_partner_id.customer_registration = True
-                self.potential_partner_id.potential_customer = False
+                # self.potential_partner_id.potential_customer = False
                 self.potential_partner_id.customer = True
                 self.potential_partner_id.name = self.name
                 self.potential_partner_id.customer_registration = self.customer_registration

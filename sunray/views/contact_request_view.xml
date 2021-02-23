@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="new_contact_request_form_view">
+            <field name="name">new.contact.request.form</field>
+            <field name="model">new.contact.request</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string = "Contact Request">
+                    <sheet>
+                        <group col="4" colspan="2">
+                            <field name="name"/>
+                            <field name="email"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="new_contact_request_tree_view">
+            <field name="name">new.contact.request.tree</field>
+            <field name="model">new.contact.request</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <field name="name"/>
+                <field name="email"/>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="ContactRequest_action_window">
+            <field name="name">Contacts Request</field>
+            <field name="res_model">new.contact.request</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

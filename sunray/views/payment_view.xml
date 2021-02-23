@@ -1,0 +1,65 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="payment_request_form_view">
+            <field name="name">payment.request.form</field>
+            <field name="model">payment.request</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string = "Business Expense Report">
+                    <sheet>
+
+                        <group string ="Purchase Request" col="4" colspan="2">
+                            <field name="pr_no"/>
+                            <field name="issue_date"/>
+                            <field name="request_company"/>
+                            <field name="item_type"/>
+                            <field name="description"/>
+                        </group>
+
+                        <notebook>
+                            <page string = "Payment form">
+                                <field name="line_ids" colspan="4">
+                                    <tree string="Driver Structure" editable="bottom">
+                                        <field name="material"/>
+                                        <field name="specification"/>
+                                        <field name="part_no"/>
+                                        <field name="quantity"/>
+                                        <field name="unit"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                        <group string = "Recommended Vendors for Bidding" colspan="5" cols="5">
+                            <field name="company_name"/>
+                            <field name="contact_person"/>
+                            <field name="contact_email"/>
+                            <field name="contact_phone"/>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="payment_request_tree_view">
+            <field name="name">payment.request.tree</field>
+            <field name="model">payment.request</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <field name="name"/>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="payment_request_action">
+            <field name="name">Payment Request</field>
+            <field name="res_model">payment.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+        </record>
+
+
+    </data>
+</odoo>

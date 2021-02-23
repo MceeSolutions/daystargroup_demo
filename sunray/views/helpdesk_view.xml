@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <record id="sunray_helpdesk_ticket_view_form" model="ir.ui.view">
+            <field name="name">helpdesk.sunray.form</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='assign_ticket_to_self']" position="after">
+                    <button name="button_request_closure" string="Request Closure" attrs="{'invisible': [('stage_name', '=', 'Solved')]}" type="object" class="btn-primary" groups="helpdesk.group_helpdesk_user"/>
+                </xpath>
+                <field name="priority" position="before">
+                    <field name="project_id"/>
+                    <field name="project_site_code_id" widget="selection"/>
+                    <field name="stage_name" invisible="1"/>
+                </field>
+            </field>
+        </record>
+
+        <menuitem id="sunray_helpdesk_project_menu_main" action="sunray_helpdesk_view_project_action_window" sequence="15" parent="helpdesk.menu_helpdesk_root"/>
+    </data>
+</odoo>

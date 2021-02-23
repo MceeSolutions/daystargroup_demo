@@ -1,5 +1,18 @@
 from datetime import date
 from odoo import models, fields, api, _
+from odoo.addons import decimal_precision as dp
+
+
+PURCHASE_REQUISITION_STATES = [
+    ('draft', 'Draft'),
+    ('submit', 'Submitted'),
+    ('approve', 'Approved'),
+    ('ongoing', 'Ongoing'),
+    ('in_progress', 'Confirmed'),
+    ('open', 'Bid Selection'),
+    ('done', 'Closed'),
+    ('cancel', 'Cancelled')
+]
     
     
 class PurchaseOrder(models.Model):
@@ -395,3 +408,182 @@ class PurchaseOrderLine(models.Model):
             for partner in self.order_id.message_partner_ids:
                 partner_ids.append(partner.id)
             self.order_id.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+
+class PurchaseRequisition(models.Model):
+    _name = "purchase.requisition"
+    _description = "Procurement Request"
+    _inherit = ['purchase.requisition']
+    
+    @api.multi
+    def _check_line_manager(self):
+        current_employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        if current_employee == self.employee_id:
+            return True
+    
+    def _default_employee(self):
+        return self.env['hr.employee'].search([('user_id','=',self.env.uid)], limit=1)
+    
+    @api.depends('state')
+    def _set_state(self):
+        self.state_blanket_order = self.state
+    
+    state = fields.Selection(PURCHASE_REQUISITION_STATES,
+                              'Status', track_visibility='onchange', required=True,
+                              copy=False, default='draft')
+    state_blanket_order = fields.Selection(PURCHASE_REQUISITION_STATES, compute='_set_state')
+    store_request_id = fields.Many2one('stock.picking','Store Request', readonly=True, track_visibility='onchange')
+    employee_id = fields.Many2one('hr.employee', 'Employee',
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, default=_default_employee)
+    request_date = fields.Date(string='Request Date', readonly=True, track_visibility='onchange', default=date.today())
+    department_name = fields.Char(string="Employee Department", related="employee_id.department_id.name", readonly=True)
+    approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
+    manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
+    manager_position = fields.Char('Manager Position', readonly=True, track_visibility='onchange')
+    po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
+    po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
+    po_manager_position = fields.Char('Manager Authorization Position', readonly=True, track_visibility='onchange')
+    submitted = fields.Boolean(string='Submitted')
+    line_manager_approval_date = fields.Date(string='Line-Manager Approval Date', readonly=True, track_visibility='onchange')
+    line_manager_approval = fields.Many2one('res.users','Line-Manager Approval Name', readonly=True, track_visibility='onchange')
+    total_cost = fields.Float(string='Total Cost', compute='_total_cost', track_visibility='onchange', readonly=True)
+    type_of_request = fields.Selection([
+        ('bid', 'Bid'),
+        ('contract', 'Contract'),
+        ('urgent', 'Urgent'),
+        ('single_source', 'Single Source')], string='Type of Request',
+        copy=False, default='bid', track_visibility='onchange')
+    justification = fields.Char('Justification', readonly=False, track_visibility='onchange')
+        
+    @api.multi
+    @api.depends('line_ids.price_subtotal')
+    def _total_cost(self):
+        for a in self:
+            for line in a.line_ids:
+                a.total_cost += line.price_subtotal
+    
+    @api.multi
+    def button_submit_purchase_agreement(self):
+        self.submitted = True
+        self.write({'state':'submit'})
+        user_ids = []
+        partner_ids = []
+        if self.employee_id.parent_id.user_id:
+            partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "Procurement Request '{}' needs approval".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        return False
+    
+    @api.multi
+    def action_line_manager_approval(self):
+        self._check_line_manager()
+        self.write({'state':'approve'})
+        self.line_manager_approval_date = date.today()
+        self.line_manager_approval = self._uid
+        self.check_manager_approval_one()
+    
+    @api.multi
+    def action_in_progress(self):
+        res = super(PurchaseRequisition, self).action_in_progress()
+        self._check_line_manager()
+        self.approval_date = date.today()
+        self.manager_approval = self._uid
+        return res
+    
+    @api.multi
+    def action_open(self):
+        self.write({'state': 'open'})
+        self.po_approval_date = date.today()
+        self.po_manager_approval = self._uid
+        group_id = self.env['ir.model.data'].xmlid_to_object('purchase.group_purchase_manager')
+        user_ids = []
+        partner_ids = []
+        for user in group_id.users:
+            user_ids.append(user.id)
+            partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "Purchase Agreement {} has been confirmed & approved".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        return False
+    
+    @api.depends('total_price')
+    def check_manager_approval_one(self):
+        if self.total_cost < 18150000.00:
+            self.need_approval = True
+            group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_below_1st_authorization')
+            user_ids = []
+            partner_ids = []
+            for user in group_id.users:
+                user_ids.append(user.id)
+                partner_ids.append(user.partner_id.id)
+            self.message_subscribe(partner_ids=partner_ids)
+            subject = "Procurement Request {} needs your approval".format(self.name)
+            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+            return False
+        else:
+            self.need_approval = False
+            
+    @api.depends('total_price')
+    def check_manager_approval_two(self):
+        if self.total_cost > 18150000.00:
+            self.need_approval = True
+            group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_above_1st_authorization')
+            user_ids = []
+            partner_ids = []
+            for user in group_id.users:
+                user_ids.append(user.id)
+                partner_ids.append(user.partner_id.id)
+            self.message_subscribe(partner_ids=partner_ids)
+            subject = "Purchase Agreement {} needs your approval, Above Quota".format(self.name)
+            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+            return False
+        else:
+            self.need_approval = False
+    
+    
+class PurchaseRequisitionLine(models.Model):
+    _name = "purchase.requisition.line"
+    _inherit = ['purchase.requisition.line']
+    
+    @api.onchange('product_id')
+    def _onchange_partner_id(self):
+        self.description = self.product_id.display_name
+        self.price_unit = self.product_id.standard_price
+        return {}
+    
+    price_unit = fields.Float(string='Unit Price', digits=dp.get_precision('Product Price'))
+    project_id = fields.Many2one(comodel_name='project.project', string='Site Location')
+    product_id = fields.Many2one('product.product', string='Product', domain=[('purchase_ok', '=', True)], required=False)
+    description = fields.Char(string='Description', required=True)
+    price_subtotal = fields.Float(string="Price Subtotal", compute="_compute_subtotal", readonly=True)
+    account_analytic_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=True)
+    
+    @api.one
+    @api.depends('product_qty', 'price_unit')
+    def _compute_subtotal(self):
+        for line in self:
+            self.price_subtotal = line.price_unit * self.product_qty
+    
+    @api.multi
+    def _prepare_purchase_order_line(self, name, product_qty=0.0, price_unit=0.0, taxes_ids=False):
+        self.ensure_one()
+        requisition = self.requisition_id
+        if requisition.schedule_date:
+            date_planned = datetime.datetime.combine(requisition.schedule_date, time.min)
+        else:
+            date_planned = datetime.datetime.now()
+        if not self.product_id:
+            raise UserError(_('Product(s) Must be created before becoming an RFQ'))
+        return {
+            'product_id': self.product_id.id,
+            'name': self.description,
+            'product_uom': self.product_id.uom_po_id.id,
+            'product_qty': product_qty,
+            'price_unit': price_unit,
+            'taxes_id': [(6, 0, taxes_ids)],
+            'date_planned': date_planned,
+            'account_analytic_id': self.account_analytic_id.id,
+            'analytic_tag_ids': self.analytic_tag_ids.ids,
+            'move_dest_ids': self.move_dest_id and [(4, self.move_dest_id.id)] or []
+        }
+    

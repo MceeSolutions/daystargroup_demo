@@ -1,0 +1,94 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="expense_report_tree_view">
+            <field name="name">expense.report.tree</field>
+            <field name="model">expense.report</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <field name ="name"/>
+                <field name="date"/>
+                <field name="day"/>
+                <field name="description"/>
+                <field name="expense"/>
+                <field name="receipt"/>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="expense_report_form_view">
+            <field name="name">expense.report.form</field>
+            <field name="model">expense.report</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string = "Business Expense Report">
+                    <sheet>
+
+                        <group col="4" colspan="2">
+                            <field name="name"/>
+                            <field name="purpose"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+
+                        <notebook>
+                            <page string = "Business Expense Form">
+                                <field name="line_ids" colspan="4">
+                                    <tree string = "Expense Structure" editable ="bottom">
+                                        <field name='date'/>
+                                        <field name='day'/>
+                                        <field name='description'/>
+                                        <field name='expense'/>
+                                        <field name='receipt'/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                        <group class="oe_left" colspan="6">
+                            <field name="employee_id"/>
+                            <field name="employee_sign_date"/>
+                        </group>
+
+                        <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                            <field name="expense_advanced" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="balance_company" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="balance_employee" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+
+                            <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                <label for="total_expense"/>
+                            </div>
+                            <field name="total_expense" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="sunray_view_hr_expense_sheet_form" model="ir.ui.view">
+            <field name="name">sunray.hr.expense.sheet.form</field>
+            <field name="model">hr.expense.sheet</field>
+            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='approve_expense_sheets']" position="after">
+                    <button name="button_md_approval" string="Approve" type="object" class="btn-primary" states="approve" groups="sunray.group_md"/>
+                </xpath>
+                <xpath expr="//button[@name='action_sheet_move_create']" position="replace">
+                    <button name="action_sheet_move_create" states="confirmed" string="Post Journal Entries" type="object" groups="account.group_account_manager" class="oe_highlight o_expense_sheet_post"/>
+                </xpath>
+                <xpath expr="//button[@name='action_sheet_move_create']" position="after">
+                    <button name="%(hr_expense.hr_expense_refuse_wizard_action)d" states="confirmed" context="{'hr_expense_refuse_model':'hr.expense.sheet'}" string="Refuse" type="action" groups="hr_expense.group_hr_expense_user" />
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="expense_report_action">
+            <field name="name">Expense</field>
+            <field name="res_model">expense.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+        </record>
+    </data>
+</odoo>

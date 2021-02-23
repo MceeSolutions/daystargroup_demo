@@ -1,0 +1,39 @@
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="brand_type_form_view">
+            <field name="name">brand type</field>
+            <field name="model">brand.type</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string = "Manufacturer">
+                    <sheet>
+                        <group col="4" colspan="2">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="active"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="brand_type_tree_view">
+            <field name="name">brand.type.tree</field>
+            <field name="model">brand.type</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="brands_action_window">
+            <field name="name">Manufacturer</field>
+            <field name="res_model">brand.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>

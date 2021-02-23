@@ -1,0 +1,36 @@
+<odoo>
+    <data>
+        <record id="sunray_product_form_view" model="ir.ui.view">
+            <field name="name">sunray.product.form</field>
+            <field name="model">product.template</field>
+            <field name="priority" eval="7" />
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <field name="categ_id" position="after">
+                    <field name="brand"/>
+                    <field name="item_type"/>
+                </field>
+                <field name="volume" position="after">
+                    <field name="dimension"/>
+                </field>
+                <field name="uom_po_id" position="after">
+                    <field name="business_unit"/>
+                    <field name="manufacturer"/>
+                    <field name="manufacturer_part_number"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="sunray_product_template_only_form_view" model="ir.ui.view">
+            <field name="name">sunray.product.template</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="product_expiration_date"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

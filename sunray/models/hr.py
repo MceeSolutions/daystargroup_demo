@@ -1,5 +1,8 @@
 from datetime import date
+from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import email_split, float_is_zero
 
 
 class Employee(models.Model):
@@ -352,3 +355,186 @@ class EmployeeContract(models.Model):
                                     mail.send()
                                 return True
         return
+
+class HrPayslipRun(models.Model):
+    _inherit = 'hr.payslip.run'
+    
+    @api.multi
+    def close_payslip_run(self):
+        self.slip_ids.action_payslip_done()
+        return self.write({'state': 'close'})
+
+class HrPayslip(models.Model):
+    _inherit = 'hr.payslip'
+    
+    prorate_days = fields.Float(string='Proration Days', required=False, help="Proration Days")
+    
+    @api.multi
+    def action_payslip_done(self):
+        self.compute_sheet()
+
+        for slip in self:
+            line_ids = []
+            debit_sum = 0.0
+            credit_sum = 0.0
+            date = slip.date or slip.date_to
+            currency = slip.company_id.currency_id
+
+            name = _('Payslip of %s') % (slip.employee_id.name)
+            move_dict = {
+                #'narration': name,
+                'ref': slip.number,
+                'journal_id': slip.journal_id.id,
+                'date': date,
+            }
+            for line in slip.details_by_salary_rule_category:
+                amount = currency.round(slip.credit_note and -line.total or line.total)
+                if currency.is_zero(amount):
+                    continue
+                debit_account_id = line.salary_rule_id.account_debit.id
+                credit_account_id = line.salary_rule_id.account_credit.id
+
+                if debit_account_id:
+                    debit_line = (0, 0, {
+                        'name': line.name,
+                        'partner_id': line._get_partner_id(credit_account=False),
+                        'account_id': debit_account_id,
+                        'journal_id': slip.journal_id.id,
+                        'date': date,
+                        'debit': amount > 0.0 and amount or 0.0,
+                        'credit': amount < 0.0 and -amount or 0.0,
+                        'analytic_account_id': line.salary_rule_id.analytic_account_id.id or slip.contract_id.analytic_account_id.id,
+                        'tax_line_id': line.salary_rule_id.account_tax_id.id,
+                    })
+                    line_ids.append(debit_line)
+                    debit_sum += debit_line[2]['debit'] - debit_line[2]['credit']
+
+                if credit_account_id:
+                    credit_line = (0, 0, {
+                        'name': line.name,
+                        'partner_id': line._get_partner_id(credit_account=True),
+                        'account_id': credit_account_id,
+                        'journal_id': slip.journal_id.id,
+                        'date': date,
+                        'debit': amount < 0.0 and -amount or 0.0,
+                        'credit': amount > 0.0 and amount or 0.0,
+                        'analytic_account_id': line.salary_rule_id.analytic_account_id.id or slip.contract_id.analytic_account_id.id,
+                        'tax_line_id': line.salary_rule_id.account_tax_id.id,
+                    })
+                    line_ids.append(credit_line)
+                    credit_sum += credit_line[2]['credit'] - credit_line[2]['debit']
+
+            if currency.compare_amounts(credit_sum, debit_sum) == -1:
+                acc_id = slip.journal_id.default_credit_account_id.id
+                if not acc_id:
+                    raise UserError(_('The Expense Journal "%s" has not properly configured the Credit Account!') % (slip.journal_id.name))
+                adjust_credit = (0, 0, {
+                    'name': _('Adjustment Entry'),
+                    'partner_id': False,
+                    'account_id': acc_id,
+                    'journal_id': slip.journal_id.id,
+                    'date': date,
+                    'debit': 0.0,
+                    'credit': currency.round(debit_sum - credit_sum),
+                })
+                line_ids.append(adjust_credit)
+
+            elif currency.compare_amounts(debit_sum, credit_sum) == -1:
+                acc_id = slip.journal_id.default_debit_account_id.id
+                if not acc_id:
+                    raise UserError(_('The Expense Journal "%s" has not properly configured the Debit Account!') % (slip.journal_id.name))
+                adjust_debit = (0, 0, {
+                    'name': _('Adjustment Entry'),
+                    'partner_id': False,
+                    'account_id': acc_id,
+                    'journal_id': slip.journal_id.id,
+                    'date': date,
+                    'debit': currency.round(credit_sum - debit_sum),
+                    'credit': 0.0,
+                })
+                line_ids.append(adjust_debit)
+            move_dict['line_ids'] = line_ids
+            move = self.env['account.move'].create(move_dict)
+            slip.write({'move_id': move.id, 'date': date})
+            #move.post()
+        return self.write({'state': 'done'})
+
+
+class HrExpense(models.Model):
+    _name = "hr.expense"
+    _inherit = "hr.expense"
+    
+    
+    analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', states={'post': [('readonly', True)], 'done': [('readonly', True)]}, oldname='analytic_account', required=True)
+    
+class HrExpenseSheet(models.Model):
+    _name = "hr.expense.sheet"
+    _inherit = 'hr.expense.sheet'
+    
+    state = fields.Selection([('submit', 'Submitted'),
+                              ('approve', 'Line Manager Approved'),
+                              ('confirmed', 'MD Approved'),
+                              ('post', 'Posted'),
+                              ('open', 'Open'),
+                              ('done', 'Paid'),
+                              ('cancel', 'Refused')
+                              ], string='Status', index=True, readonly=True, track_visibility='onchange', copy=False, default='submit', required=True,
+    help='Expense Report State')
+    
+    @api.multi
+    def button_md_approval(self):
+        self.write({'state': 'confirmed'})
+        return {}
+    
+    @api.multi
+    def expense_md_approval_notification(self):
+        group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_md')
+        user_ids = []
+        partner_ids = []
+        for user in group_id.users:
+            user_ids.append(user.id)
+            partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "Expense '{}' needs approval".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        return False
+    
+    @api.multi
+    def approve_expense_sheets(self):
+        if not self.user_has_groups('hr_expense.group_hr_expense_user'):
+            raise UserError(_("Only Managers and HR Officers can approve expenses"))
+        elif not self.user_has_groups('hr_expense.group_hr_expense_manager'):
+            current_managers = self.employee_id.parent_id.user_id | self.employee_id.department_id.manager_id.user_id
+
+            if self.employee_id.user_id == self.env.user:
+                raise UserError(_("You cannot approve your own expenses"))
+
+            if not self.env.user in current_managers:
+                raise UserError(_("You can only approve your department expenses"))
+
+        responsible_id = self.user_id.id or self.env.user.id
+        self.write({'state': 'approve', 'user_id': responsible_id})
+        self.activity_update()
+        self.expense_md_approval_notification()
+    
+    @api.multi
+    def action_sheet_move_create(self):
+        if any(sheet.state != 'confirmed' for sheet in self):
+            raise UserError(_("You can only generate accounting entry for approved expense(s)."))
+
+        if any(not sheet.journal_id for sheet in self):
+            raise UserError(_("Expenses must have an expense journal specified to generate accounting entries."))
+
+        expense_line_ids = self.mapped('expense_line_ids')\
+            .filtered(lambda r: not float_is_zero(r.total_amount, precision_rounding=(r.currency_id or self.env.user.company_id.currency_id).rounding))
+        res = expense_line_ids.action_move_create()
+
+        if not self.accounting_date:
+            self.accounting_date = self.account_move_id.date
+
+        if self.payment_mode == 'own_account' and expense_line_ids:
+            self.write({'state': 'post'})
+        else:
+            self.write({'state': 'done'})
+        self.activity_update()
+        return res

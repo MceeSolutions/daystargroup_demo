@@ -1,23 +1,33 @@
+from datetime import date
 from odoo import models, fields, api, _
 
 
 class AvailabilityRequest(models.Model):
+    """Availability request."""
     _name = "availability.request"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Availability Demand Form"
     
-    name = fields.Char('Order Reference', readonly=True, required=True, index=True, copy=False, default='New')    
+    name = fields.Char('Order Reference', readonly=True, required=True, index=True, copy=False, default='New')
+    
     state = fields.Selection([
         ('draft', 'Draft'),
         ('submit', 'Submitted'),
         ('approve', 'Approved'),
         ('reject', 'Rejected'),
-        ], string='Status', readonly=True, index=True, copy=False, default='draft', track_visibility='onchange')
-    
+    ],
+        string='Status',
+        readonly=True,
+        index=True,
+        copy=False,
+        default='draft',
+        track_visibility='onchange'
+    )
+        
     def _default_employee(self):
         self.env['hr.employee'].search([('user_id','=',self.env.uid)])
         return self.env['hr.employee'].search([('user_id','=',self.env.uid)])
-    
+
     @api.multi
     def button_reset(self):
         self.write({'state': 'draft'})
@@ -25,6 +35,7 @@ class AvailabilityRequest(models.Model):
     
     @api.multi
     def button_submit(self):
+        """update state when submitted"""
         self.write({'state': 'submit'})
         return {}
     

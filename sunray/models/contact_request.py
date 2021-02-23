@@ -1,4 +1,4 @@
-from . import models, fields
+from odoo import models, fields
 
 
 class ContactRequest(models.Model):
