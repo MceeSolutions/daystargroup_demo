@@ -1,0 +1,45 @@
+<odoo>
+	<data>
+		<record id="sunray_view_order_form" model="ir.ui.view">
+			<field name="name">sunray.sale.order.form</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_form" />
+			<field name="arch" type="xml">
+				<field name="name" position="before">
+					<field name= "need_management_approval" invisible = "1"/>
+					<h3 attrs="{'invisible': [('need_management_approval', '=', False)]}">
+						<b>Needs Management Approval, The Management has been notified </b>
+					</h3>
+				</field>
+				<xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
+					<field name="type" required = "1"/>
+					<!-- <field name="project_id" required = "0" domain="[('partner_id','=', parent.partner_id)]"/> -->
+					<!-- <field name="site_code_id" required = "0" domain="[('partner_id','=', parent.partner_id)]"/> -->
+				</xpath>
+				<xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
+					<field name="type" required = "1"/>
+					<!-- <field name="project_id" required = "0" domain="[('partner_id','=', parent.partner_id)]"/> -->
+					<!-- <field name="site_code_id" required = "0" domain="[('partner_id','=', parent.partner_id)]"/> -->
+				</xpath>
+				<xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+					<field name="analytic_account_id" required = "1"/>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="sunray_sale_subscription_view_form" model="ir.ui.view">
+			<field name="name">sunray.sale.subscription.form</field>
+			<field name="model">sale.subscription</field>
+			<field name="inherit_id" ref="sale_subscription.sale_subscription_view_form"/>
+			<field name="arch" type="xml">
+				<field name="tag_ids" position="after">
+					<field name="sale_order_id"/>
+				</field>
+				<xpath expr="//field[@name='recurring_invoice_line_ids']/tree/field[@name='name']" position="after">
+					<!-- <field name="site_code_id" required = "0" domain="[('partner_id','=', parent.partner_id)]"/> -->
+					<field name="account_analytic_id" required = "1"/>
+				</xpath>
+			</field>
+		</record>
+	</data>
+</odoo>

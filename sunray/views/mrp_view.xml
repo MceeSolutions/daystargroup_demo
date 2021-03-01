@@ -1,0 +1,67 @@
+<odoo>
+	<data>
+
+		<record id="sunray_mrp_production_tree_view" model="ir.ui.view">
+			<field name="name">sunray.mrp.production.tree</field>
+			<field name="model">mrp.production</field>
+			<field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+			<field name="arch" type="xml">
+				<field name="name" position="before">
+					<field name="approved_mo" invisible="1"/>
+				</field>
+				<xpath expr="//button[@name='action_assign']" position="before">
+					<button name="button_mrp_approved" string="Approve MO" type="object" class="btn-primary" groups="sunray.group_head_projects,project.group_project_manager" attrs="{'invisible': [('approved_mo', '=', True)]}"/>
+				</xpath>
+				<field name="product_id" position="before">
+					<field name="project_id"/>
+				</field>
+				<xpath expr="//field[@name='move_raw_ids']/tree/field[@name='product_uom_qty']" position="before">
+					<field name="account_id"/>
+					<field name="analytic_account_id"/>
+				</xpath>
+				<xpath expr="//notebook" position="before">
+					<group class="oe_subtotal oe_left">
+						<field name="project_budget" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+					</group>
+				</xpath>
+				<field name="move_raw_ids" position="after">
+					<group class="oe_subtotal_footer oe_right">
+						<field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+					</group>
+				</field>
+				<xpath expr="//field[@name='move_raw_ids']/tree" position="attributes">
+					<attribute name="editable">1</attribute>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="sunray_mrp_bom_form_view" model="ir.ui.view">
+			<field name="name">sunray.mrp.bom.form</field>
+			<field name="model">mrp.bom</field>
+			<field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_qty']" position="after">
+					<field name="bom_unit_cost" readonly = "1"/>
+				</xpath>
+				<xpath expr="//field[@name='bom_line_ids']/tree/field[@name='operation_id']" position="after">
+					<field name="subtotal_estimated_cost" readonly = "1"/>
+				</xpath>
+				<field name="bom_line_ids" position="after">
+					<group class="oe_subtotal_footer oe_right">
+						<field name="total_bom_cost" readonly = "1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+					</group>
+				</field>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="sunray_mrp_production_action">
+			<field name="name">Manufacturing Orders</field>
+			<field name="res_model">mrp.production</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+		
+	</data>
+</odoo>

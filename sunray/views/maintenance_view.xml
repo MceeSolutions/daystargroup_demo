@@ -1,0 +1,21 @@
+<odoo>
+	<data>
+		<record id="sunray_maintenance_hr_equipment_request_view_form" model="ir.ui.view">
+			<field name="name">sunray.equipment.request.form</field>
+			<field name="model">maintenance.request</field>
+			<field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//button[@name='archive_equipment_request']" position="before">
+					<button string="Create Replacement" name="create_repair_request" type="object" attrs="{'invisible': [('archive', '=', True)]}"/>
+				</xpath>
+				<field name="equipment_id" position="replace">
+					<field name="equipment_id" context="{'default_category_id':category_id}" invisible="0"/>
+				</field>
+				<field name="equipment_id" position="after">
+					<field name="product_id" invisible="1"/>
+					<!-- <field name="site_code_id"/> -->
+				</field>
+			</field>
+		</record>
+	</data>
+</odoo>

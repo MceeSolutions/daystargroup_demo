@@ -1,0 +1,114 @@
+<odoo>
+	<data>
+
+		<record id="site_code_request_view_form" model="ir.ui.view">
+			<field name="name">site.code.request.form</field>
+			<field name="model">site.code.request</field>
+			<field name="arch" type="xml">
+				<form string="Channel">
+					<group>
+						<field name="partner_id"/>
+						<field name="state_id"/>
+						<field name="area"/>
+					</group>
+				</form>
+			</field>
+		</record>
+
+		<record id="site_code_requested_view_form" model="ir.ui.view">
+			<field name="name">site.code.requested.form</field>
+			<field name="model">site.code.request</field>
+			<field name="arch" type="xml">
+				<form string="Site Code Request">
+					<group class="oe_title">
+						<field name="partner_id" required="1"/>
+						<field name="state_id" required="1"/>
+						<field name="area" required="1"/>
+					</group>
+					<footer>
+						<button name="action_request_information_apply" string="Send Request" type="object" class="btn btn-sm btn-primary"/>
+						<button string="Cancel" class="btn btn-sm btn-default" special="cancel"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="sunray_site_code_tree_view">
+			<field name="name">sunray.site.code.tree</field>
+			<field name="model">site.code</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="name" string="Code"/>
+				<field name="partner_id"/>
+				<field name="state_id"/>
+				<field name="project_id"/>
+				<field name="site_area"/>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="sunray_site_code_form_view">
+			<field name="name">site Code</field>
+			<field name="model">site.code</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string = "Site Location">
+					<header>
+						<button string="Create Project" name="create_project_from_site_code" type="object" class="oe_highlight" attrs="{'invisible': [('project_id', '!=', False)]}"/>
+					</header>
+					<sheet>
+						<div class="oe_button_box" name="button_box">
+							<button name="toggle_active" type="object" groups="base.group_user" class="oe_stat_button" icon="fa-archive">
+								<field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+							</button>
+						</div>
+						<group>
+							<field name="lead_id"/>
+						</group>
+						<group col="4" colspan="2">
+							<field name="partner_id"/>
+							<field name="state_id"/>
+							<field name="name" string="Code" readonly="0" required="0"/>
+							<field name="project_id"/>
+							<field name="site_area" required="1"/>
+							<field name="num" invisible="1"/>
+							<label for="site_address" string="Site Address"/>
+							<div class="o_address_format">
+								<field name="address_number" placeholder="Number" class="o_address_street"/>
+								<field name="address_street" placeholder="Street..." class="o_address_street"/>
+								<field name="address_city" placeholder="City" class="o_address_city"/>
+								<field name="address_state_id" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
+								<field name="address_country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+							</div>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<record id="site_code_request_action" model="ir.actions.act_window">
+			<field name="name">Site Code Request</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">site.code.request</field>
+			<field name="context">{}</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="site_code_requested_view_form"/>
+			<field name="target">new</field>
+		</record>
+
+		<!-- <record model="ir.actions.act_window" id="site_location_action_window">
+      		<field name="name">Site Code</field>
+      		<field name="res_model">site.code</field>
+      		<field name="view_mode">tree,form</field>
+    	</record>-->
+
+		<record model="ir.actions.act_window" id="site_location_action_window">
+			<field name="name">Site Code</field>
+			<field name="res_model">site.code</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+	</data>
+</odoo>

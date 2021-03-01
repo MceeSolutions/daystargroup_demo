@@ -1,0 +1,704 @@
+<odoo>
+	<data>
+
+		<record id="project.open_view_project_all" model="ir.actions.act_window">
+			<field name="name">Projects</field>
+			<field name="res_model">project.project</field>
+			<field name="view_type">form</field>
+			<field name="domain">[]</field>
+			<field name="view_mode">tree,kanban,form</field>
+			<field name="view_id" ref="project.view_project_kanban"/>
+			<field name="search_view_id" ref="project.view_project_project_filter"/>
+			<field name="target">main</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">
+                    Create a new project
+				</p>
+				<p>
+                    Or <a type="action" name="%(project.ir_actions_server_project_sample)d" tabindex="-1">activate a sample project</a> to play with.
+				</p>
+			</field>
+		</record>
+
+		<record id="sunray_edit_project" model="ir.ui.view">
+			<field name="name">sunray.project.form</field>
+			<field name="model">project.project</field>
+			<field name="inherit_id" ref="project.edit_project" />
+			<field name="arch" type="xml">
+				<xpath expr="//header" position="inside">
+					<!-- <button name="create_purchase_agreement" class="btn-primary" string="Create Purchase Agreement" type="object"/>-->
+					<!-- <button name="create_store_request" class="btn-primary" string="Create Store Request" type="object"/>  -->
+					<!-- <button name="create_manufacturing_order" class="btn-primary" string="Create Manufacturing Order" type="object"/> -->
+					<field name="state" widget="statusbar" statusbar_visible="kick_off,project_plan,supply_chain_project_execution,qc_sign_off,customer_sign_off,close_out,installed,decommissioned" clickable="1"/>
+				</xpath>
+				<xpath expr="//button[@name='toggle_active']" position="before">
+					<button class="oe_stat_button" type="object" name="open_project_checklist" icon="fa-list">
+						<div class="o_stat_info">
+							<field name="checklist_count" class="o_stat_value"/>
+							<span class="o_stat_text">Checklist</span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_customer_picking_list" icon="fa-list">
+						<div class="o_stat_info">
+							<field name="customer_picking_list_count" class="o_stat_value"/>
+							<span class="o_stat_text">Picking List</span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_project_action" icon="fa-unsorted">
+						<div class="o_stat_info">
+							<field name="action_count" class="o_stat_value"/>
+							<span class="o_stat_text">Action</span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_project_issues" icon="fa-sticky-note-o">
+						<div class="o_stat_info">
+							<field name="issues_count" class="o_stat_value"/>
+							<span class="o_stat_text">Issues</span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_project_risk" icon="fa-exclamation-circle">
+						<div class="o_stat_info">
+							<field name="risk_count" class="o_stat_value"/>
+							<span class="o_stat_text">Risk</span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_project_change_request" icon="fa-pencil-square-o">
+						<div class="o_stat_info">
+							<field name="change_request_count" class="o_stat_value"/>
+							<span class="o_stat_text">Change Request </span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_project_ehs" icon="fa-sort-asc">
+						<div class="o_stat_info">
+							<field name="ehs_count" class="o_stat_value"/>
+							<span class="o_stat_text">EHS</span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_project_decision" icon="fa-arrows">
+						<div class="o_stat_info">
+							<field name="decision_count" class="o_stat_value"/>
+							<span class="o_stat_text">Decisions </span>
+						</div>
+					</button>
+					<button class="oe_stat_button" type="object" name="open_manfacturing_order" icon="fa-gears">
+						<div class="o_stat_info">
+							<field name="mo_count" class="o_stat_value"/>
+							<span class="o_stat_text">Manufacturing Orders</span>
+						</div>
+					</button>
+					<!-- <button class="oe_stat_button" type="object" name="open_parent_project" icon="fa-gears">
+	                    <div class="o_stat_info">
+	                        <field name="parent_project_count" class="o_stat_value"/>
+	                        <span class="o_stat_text">Parent Project</span>
+	                    </div>
+	                </button>  -->
+				</xpath>
+				<field name="user_id" position="before">
+					<field name="parent_project_id"/>
+					<field name="crm_lead_id"/>
+				</field>
+				<field name="user_id" position="after">
+					<field name="lead_technician_id"/>
+					<field name="quality_assurance_id"/>
+					<field name="project_engineers_id" widget="many2many_tags"/>
+					<!-- <field name="account_id"/>
+				  	<field name="account_analytic_id"/> -->
+					<field name="project_plan_file" widget="file"/>
+					<field name="project_budget" widget="Monetary"/>
+				</field>
+				<field name="partner_id" position="replace">
+					<field name="partner_id" required="0" domain="[('customer','=', True)]"/>
+				</field>
+				<field name="partner_id" position="after">
+					<field name="site_location_id" required = "1"/>
+					<field name="site_area" required = "1"/>
+				</field>
+				<xpath expr="//notebook" position="inside">
+					<page string="Additional Information">
+						<group col="4" colspan="2">
+							<field name="monthly_maintenance_schedule"/>
+							<field name="client_site_visit"/>
+							<field name="internal_external_monthly"/>
+							<field name="client_type"/>
+							<field name="site_address"/>
+							<field name="site_type"/>
+							<field name="region"/>
+							<field name="country_id"/>
+							<field name="commissioning_date"/>
+							<field name="coordinates"/>
+							<field name="type_of_offer"/>
+							<field name="atm_power_at_night"/>
+							<field name="tariff_per_kwp"/>
+							<field name="solar_capacity"/>
+							<field name="total_capacity"/>
+							<field name="currency_id"/>
+							<field name="monthly_service_fees"/>
+							<field name="lease_duration"/>
+							<field name="sales_price"/>
+						</group>
+					</page>
+				</xpath>
+				<field name="message_follower_ids" position="after">
+					<field name="activity_ids" widget="mail_activity"/>
+					<field name="message_ids" widget="mail_thread"/>
+				</field>
+			</field>
+		</record>
+
+		<record id="sunray_project_project_view_form_simplified" model="ir.ui.view">
+			<field name="name">sunray.project.form</field>
+			<field name="model">project.project</field>
+			<field name="inherit_id" ref="project.project_project_view_form_simplified" />
+			<field name="arch" type="xml">
+				<field name="user_id" position="before">
+					<field name="crm_lead_id"/>
+				</field>
+				<field name="user_id" position="after">
+					<field name="partner_id" required="0" domain="[('customer','=', True)]"/>
+					<!-- <field name="site_location_id" required="0"/> -->
+				</field>
+				<!-- <field name="user_id" position="after">
+				  	<field name="account_id"/>
+				  	<field name="account_analytic_id"/>
+				</field> -->
+			</field>
+		</record>
+
+
+		<!-- project decisions form view-->
+		<record id="project_decision_form_view" model="ir.ui.view">
+			<field name="name">project.decision.form</field>
+			<field name="model">project.decision</field>
+			<field name="priority" eval="2"/>
+			<field name="arch" type="xml">
+				<form string="Action">
+					<header>
+						<field name="project_decision_state" widget="statusbar" statusbar_visible="draft,wip,closed,on_hold,open" readonly="0" clickable="1"/>
+					</header>
+					<sheet>
+
+						<group colspan="2">
+							<field name="decision_detail" default_focus="1"/>
+							<field name="project_id" required="1" readonly="1"/>
+							<field name="partner_id" readonly="1"/>
+						</group>
+						<group col="4" colspan="4">
+							<field name="decision_impact"/>
+							<field name="date"/>
+							<field name="staff_id"/>
+							<field name="employee_id"/>
+							<field name="comments"/>
+						</group>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+
+		<record id="sunray_view_project" model="ir.ui.view">
+			<field name="name">sunray.project.tree</field>
+			<field name="model">project.project</field>
+			<field name="inherit_id" ref="project.view_project"/>
+			<field name="arch" type="xml">
+				<field name="partner_id" position="after">
+					<field name="crm_lead_id"/>
+					<field name="state"/>
+				</field>
+			</field>
+		</record>
+
+		<!-- project change request -->
+		<record model="ir.actions.act_window" id="sunray_project_change_request_form_action">
+			<field name="name">Project Change Request</field>
+			<field name="res_model">project.change_request</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+		<!-- project change request tree view-->
+		<record id="project_change_change_tree_view" model="ir.ui.view">
+			<field name="name">project.change_request.tree</field>
+			<field name="model">project.change_request</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="project_id"/>
+				<field name="partner_id"/>
+			</field>
+		</record>
+
+		<!-- project change request form view-->
+		<record id="project_change_request_form_view" model="ir.ui.view">
+			<field name="name">project.change_request.form</field>
+			<field name="model">project.change_request</field>
+			<field name="priority" eval="2"/>
+			<field name="arch" type="xml">
+				<form string="Action">
+					<header>
+						<button name="button_submit" states="draft" string="Submit" type="object"/>
+						<button name="button_approve" states="submit" string="Approve" type="object" groups="project.group_project_manager"/>
+						<button name="button_reject" states="submit" string="Reject" type="object" groups="project.group_project_manager"/>
+						<button name="button_reset" states="reject,on_hold" string="Set to Draft" type="object" />
+						<button name="button_close" states="approved,rejected" string="Close" type="object"/>
+						<field name="state" widget="statusbar" statusbar_visible="draft,submit,approved,closed" readonly="1" clickable="0"/>
+					</header>
+					<sheet>
+						<group colspan="2">
+							<field name="project_id" required="1" readonly="1"/>
+							<field name="partner_id"/>
+							<field name="employee_id"/>
+						</group>
+						<group col="4" colspan="4">
+							<field name="date"/>
+							<field name="project_change_request_priority" widget="priority"/>
+						</group>
+						<field name="project_change_request_line_ids">
+							<tree editable="bottom">
+								<!-- <field name="s_n" readonly="1" style="oe_left"/>-->
+								<field name="project_change_request_description"/>
+								<field name="comments"/>
+							</tree>
+						</field>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+
+		<!-- project risk-->
+		<record model="ir.actions.act_window" id="sunray_project_riskform_action">
+			<field name="name">Project Risk</field>
+			<field name="res_model">project.risk</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+		<!-- project risk  tree view-->
+		<record id="project_risk_tree_view" model="ir.ui.view">
+			<field name="name">project.risk.tree</field>
+			<field name="model">project.risk</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="project_id"/>
+				<field name="partner_id"/>
+			</field>
+		</record>
+
+		<!-- project risk form view -->
+
+		<record id="project_risk_form_view" model="ir.ui.view">
+			<field name="name">project.risk.form</field>
+			<field name="model">project.risk</field>
+			<field name="priority" eval="2"/>
+			<field name="arch" type="xml">
+				<form string="Action">
+					<header>
+						<field name="state" widget="statusbar" readonly="0" clickable="1"/>
+					</header>
+					<sheet>
+						<group colspan="2">
+							<field name="project_id" required="1" readonly="1"/>
+							<field name="partner_id"/>
+						</group>
+
+						<field name="project_risk_line_ids">
+							<tree editable="bottom">
+								<field name = "risk_title"/>
+								<field name ="risk_impact"/>
+								<field name ="risk_status"/>
+								<field name ="employee_id"/>
+								<field name ="date"/>
+								<field name ="risk_category"/>
+								<field name ="mitigation"/>
+								<field name ="date_closed"/>
+							</tree>
+						</field>
+
+					</sheet>
+
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+
+			</field>
+		</record>
+
+		<record id="project_checklist_form_view" model="ir.ui.view">
+			<field name="name">project.checklist.form</field>
+			<field name="model">project.checklist</field>
+			<field name="priority" eval="2"/>
+			<field name="arch" type="xml">
+				<form string="Checklist">
+					<header>
+						<button name="button_select_all" string="Select All" type="object" class="btn btn-primary" groups="base.group_user" confirm="Please make sure ALL documents are complete otherwise Cancel"/>
+					</header>
+					<sheet>
+						<group colspan="2">
+							<field name="project_id" required="1" readonly="1"/>
+							<field name="partner_id"/>
+						</group>
+
+						<group string="Review"></group>
+						<field name="detailed_site_review"/>
+						<span>
+								Detailed site review
+						</span>
+						<br/>
+						<br/>
+						<field name="detailed_system_design"/>
+						<span>
+								Detailed System design
+						</span>
+						<br/>
+						<br/>
+						<field name="two_d_diagram"/>
+						<span>
+								2D Diagram
+						</span>
+						<br/>
+						<br/>
+						<field name="cable_schedule"/>
+						<span>
+								Cable Schedule
+						</span>
+						<br/>
+						<br/>
+						<field name="panel_layout"/>
+						<span>
+								Panel Layout
+						</span>
+						<br/>
+						<br/>
+						<field name="ancillary_equipment_breakdown"/>
+						<span>
+								Ancillary Equipment breakdown
+						</span>
+						<br/>
+						<br/>
+
+						<group string="Project Plan Checklist"></group>
+						<field name="project_schedule"/>
+						<span>
+								Project Schedule
+						</span>
+						<br/>
+						<br/>
+						<field name="purchase_stock_request_ancillaries_equipment"/>
+						<span>
+								Purchase or stock request for ancillaries’ equipment
+						</span>
+						<br/>
+						<br/>
+						<field name="project_planning_form"/>
+						<span>
+								Project planning Form
+						</span>
+						<br/>
+						<br/>
+
+						<group string="Project Execution"></group>
+						<field name="communication_with_clients"/>
+						<span>
+								Communication with clients
+						</span>
+						<br/>
+						<br/>
+						<field name="technician_assignment"/>
+						<span>
+								Technician assignment
+						</span>
+						<br/>
+						<br/>
+						<field name="execution"/>
+						<span>
+								Execution
+						</span>
+						<br/>
+						<br/>
+						<field name="quality_assurance"/>
+						<span>
+								Quality Assurance
+						</span>
+						<br/>
+						<br/>
+						<field name="commissioning_test"/>
+						<span>
+								Commissioning test
+						</span>
+						<br/>
+						<br/>
+						<field name="job_completion_certificate"/>
+						<span>
+								Job Completion Certificate
+						</span>
+						<br/>
+						<br/>
+						<field name="training"/>
+						<span>
+								Training
+						</span>
+						<br/>
+						<br/>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+
+		<!-- checklist ticket action-->
+		<record model="ir.actions.act_window" id="sunray_project_checklist_action">
+			<field name="name">Project Checklist</field>
+			<field name="res_model">project.checklist</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+		<!-- checklist.ticket  tree view-->
+		<record id="checklist_ticket_tree_view" model="ir.ui.view">
+			<field name="name">project.checklist.tree</field>
+			<field name="model">project.checklist</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="project_id"/>
+				<field name="partner_id"/>
+			</field>
+		</record>
+
+		<!-- project issues action-->
+		<record model="ir.actions.act_window" id="sunray_project_issuesform_action">
+			<field name="name">Project Issues</field>
+			<field name="res_model">project.issues</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+		<!-- project issues tree view-->
+		<record id="project_issues_tree_view" model="ir.ui.view">
+			<field name="name">project.issues.tree</field>
+			<field name="model">project.issues</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="project_id"/>
+				<field name="partner_id"/>
+			</field>
+		</record>
+
+		<record id="project_issues_form_view" model="ir.ui.view">
+			<field name="name">project.issues.form</field>
+			<field name="model">project.issues</field>
+			<field name="priority" eval="2"/>
+			<field name="arch" type="xml">
+				<form string="Action">
+					<header>
+						<field name="state" widget="statusbar" statusbar_visible="draft,wip,closed,on_hold,open" readonly="0" clickable="1"/>
+					</header>
+					<sheet>
+						<h1>
+							<field name="name" default_focus="1" placeholder="Issue Title"/>
+						</h1>
+						<group colspan="2">
+							<field name="project_id" required="1" readonly="1"/>
+							<field name="partner_id"/>
+						</group>
+						<group col="4" colspan="4">
+							<field name="employee_id"/>
+							<field name="date"/>
+							<field name="project_action_priority" widget="priority"/>
+							<field name="project_issue_severity"/>
+							<field name="description"/>
+							<field name="comments"/>
+						</group>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+
+		<!-- project action-->
+		<record model="ir.actions.act_window" id="sunray_project_actionform_action">
+			<field name="name">Project Action</field>
+			<field name="res_model">project.action</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+		<!-- project action tree view-->
+		<record id="project_action_tree_view" model="ir.ui.view">
+			<field name="name">project.action.tree</field>
+			<field name="model">project.action</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="project_id"/>
+				<field name="partner_id"/>
+			</field>
+		</record>
+
+		<record id="project_action_form_view" model="ir.ui.view">
+			<field name="name">project.action.form</field>
+			<field name="model">project.action</field>
+			<field name="priority" eval="2"/>
+			<field name="arch" type="xml">
+				<form string="Action">
+					<header>
+						<field name="state" widget="statusbar" statusbar_visible="draft,wip,closed,on_hold,open" readonly="0" clickable="1"/>
+					</header>
+					<sheet>
+						<group colspan="2">
+							<field name="project_id" required="1" readonly="1"/>
+							<field name="partner_id"/>
+						</group>
+						<group col="4" colspan="4">
+							<field name="employee_id"/>
+							<field name="due_date"/>
+							<field name="project_action_priority" widget="priority"/>
+						</group>
+						<field name="project_action_line_ids">
+							<tree editable="bottom">
+								<!-- <field name="s_n" readonly="1" style="oe_left"/> -->
+								<field name="action_items"/>
+								<field name="comments"/>
+							</tree>
+						</field>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+
+		<!-- project ehs-->
+		<record model="ir.actions.act_window" id="sunray_project_ehsform_action">
+			<field name="name">Project ehs</field>
+			<field name="res_model">project.ehs</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+		<!-- project ehs tree view-->
+		<record id="project_ehs_tree_view" model="ir.ui.view">
+			<field name="name">project.ehs.tree</field>
+			<field name="model">project.ehs</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="project_id"/>
+				<field name="partner_id"/>
+			</field>
+		</record>
+
+		<!-- project ehs form view-->
+		<record id="project_ehs_form_view" model="ir.ui.view">
+			<field name="name">project.ehs.form</field>
+			<field name="model">project.ehs</field>
+			<field name="priority" eval="2"/>
+			<field name="arch" type="xml">
+				<form string="Action">
+					<header>
+						<field name="project_ehs_state" widget="statusbar" statusbar_visible="draft,wip,closed,on_hold,open" readonly="0" clickable="1"/>
+					</header>
+					<sheet>
+						<h1>
+							<field name="project_ehs_name" default_focus="1" placeholder="Issue Title"/>
+						</h1>
+						<group colspan="2">
+							<field name="project_id" required="1" readonly="1"/>
+							<field name="partner_id"/>
+						</group>
+						<group col="4" colspan="4">
+							<field name="employee_id"/>
+							<field name="date"/>
+							<field name="project_ehs_priority" widget="priority"/>
+							<field name="project_ehs_severity"/>
+							<field name="project_ehs_description"/>
+							<field name="comments"/>
+						</group>
+					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="activity_ids" widget="mail_activity"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
+				</form>
+			</field>
+		</record>
+
+
+		<!-- project decision-->
+		<record model="ir.actions.act_window" id="sunray_project_decisionform_action">
+			<field name="name">Project Decision</field>
+			<field name="res_model">project.decision</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+			<field name="domain">[]</field>
+			<field name="context">{}</field>
+		</record>
+
+		<!-- project decisions tree view-->
+		<record id="project_decision_tree_view" model="ir.ui.view">
+			<field name="name">project.decision.tree</field>
+			<field name="model">project.decision</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<field name="project_id"/>
+				<field name="partner_id"/>
+			</field>
+		</record>
+
+		<record id="sunray_helpdesk_view_project" model="ir.ui.view">
+			<field name="name">project.project.tree</field>
+			<field name="model">project.project</field>
+			<field name="arch" type="xml">
+				<tree string="Projects">
+					<field name="name" string="Project Name"/>
+					<field name="user_id" string="Project Manager"/>
+					<field name="lead_technician_id" string="Lead Technician"/>
+					<field name="partner_id" string="Customer"/>
+					<field name="monthly_maintenance_schedule"/>
+					<field name="client_site_visit"/>
+					<field name="internal_external_monthly"/>
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="sunray_helpdesk_view_project_action_window">
+			<field name="name">Projects</field>
+			<field name="res_model">project.project</field>
+			<field name="context">{}</field>
+			<field name="domain">[('state', '=', 'close_out')]</field>
+			<field name="view_mode">tree</field>
+			<field name="view_id" ref="sunray_helpdesk_view_project"/>
+		</record>
+	</data>
+</odoo>

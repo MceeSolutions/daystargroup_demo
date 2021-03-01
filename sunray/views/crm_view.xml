@@ -1,0 +1,90 @@
+<odoo>
+    <data>
+
+        <record id="sunray_crm_case_form_view_leads" model="ir.ui.view">
+            <field name="name">sunray.crm.lead.form.leadform</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_set_lost']" position="before">
+                    <field name="lead_approval" invisible="1"/>
+                    <button name="button_submit" string="Submit" type="object" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('active', '=', True)]}"/>
+                    <button name="button_approve" states="submit" string="Approve" type="object" groups="account.group_account_invoice"/>
+                    <button name="button_reject" states="submit" string="Reject" type="object" groups="account.group_account_invoice"/>
+                    <button name="button_reset" states="reject" string="Set to Draft" type="object" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submit,approve" readonly="1"/>
+                </xpath>
+
+                <xpath expr="//button[@name='toggle_active']" position="replace">
+                    <button name="toggle_active" string="Restore" type="object" attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}"/>
+                </xpath>
+                <xpath expr="//button[@name='action_set_lost']" position="replace">
+                    <button name="action_set_lost" string="Mark as Lost" type="object" attrs="{'invisible': ['&amp;', ('probability', '=', 0), ('active', '=', False)]}"/>
+                </xpath>
+                <field name="mobile" position="after">
+                    <field name="private_lead"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="pipeline_sunray_form1" model="ir.ui.view">
+            <field name="name">pipeline.sunray.form</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_set_won_rainbowman']" position="replace">
+                    <button name="action_set_won_rainbowman" string="Mark Won" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('active','=',False), ('probability', '=', 100)]}" confirm="are you sure this lead has been won?"/>
+                </xpath>
+                <xpath expr="//field[@name='date_deadline']" position="after">
+                    <field name="company_id" invisible="1"/>
+                </xpath>
+                <field name="tag_ids" position="after">
+                    <field name="contract_duration" />
+                    <field name="coordinates" />
+                    <field name="type_of_offer" />
+                    <field name="tariff_per_kwp" />
+                    <field name="solar_capacity" />
+                    <field name="total_capacity" />
+                </field>
+                <field name="name" position="before">
+                    <field name="legal_review" invisible="1"/>
+                    <field name="legal_review_done" invisible="1"/>
+                    <field name="request_site_code" invisible="1"/>
+                </field>
+                <field name="team_id" position="after">
+                    <field name="client_type" />
+                    <field name="site_area" />
+                    <field name="site_address" />
+                    <field name="site_type" />
+                    <field name="site_location_id" />
+                    <field name="region" />
+                    <field name="country_id" />
+                    <field name="monthly_service_fees" />
+                    <field name="sales_price" />
+                    <field name="opportunity_created_date"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="sunray_crm_legal_approval_action_window">
+            <field name="name">Legal Approval (Opportunities)</field>
+            <field name="res_model">crm.lead</field>
+            <field name="context">{}</field>
+            <field name="domain">[('legal_review', '=', True)]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.actions.act_window" id="sunray_crm_leads_approval_action_window">
+            <field name="name">Leads Approval</field>
+            <field name="res_model">crm.lead</field>
+            <field name="context">{}</field>
+            <field name="domain">[('active', '=', False)]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="sunray_crm_legal_id" name="Legal" parent="crm.crm_menu_root" sequence="20" groups="sunray.group_legal_team"/>
+        <menuitem id="sunray_crm_legal_approval_id" name="Legal Approval" parent="sunray_crm_legal_id" sequence="20" groups="sunray.group_legal_team" action="sunray_crm_legal_approval_action_window"/>
+        <menuitem id="sunray_crm_leads_approval_id" name="Leads Approval" parent="sunray_crm_legal_id" sequence="20" groups="sunray.group_legal_team" action="sunray_crm_leads_approval_action_window"/>
+
+    </data>
+</odoo>

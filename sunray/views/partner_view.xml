@@ -1,0 +1,264 @@
+<odoo>
+	<data>
+
+		<record id="sunray_res_partner_view_vendor_rating" model="ir.ui.view">
+			<field name="name">res.partner.view.sunray.vendor.rating</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//button[@name='toggle_active']" position="before">
+					<button class="oe_stat_button" type="object" name="open_customers_site_code" icon="fa-list">
+						<div class="o_stat_info">
+							<field name="site_code_count" class="o_stat_value"/>
+							<span class="o_stat_text">Site Code(s)</span>
+						</div>
+					</button>
+				</xpath>
+				<field name="vat" position="after">
+					<field name="tin" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="vendor_registration" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="tax_compliance" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="due_diligence_form" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="cac" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="delivery_speed" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="overall_vendor_rating" widget="priority" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="wht_rate" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="transaction_authority" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="transaction_class" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="transaction_description" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="iban" attrs="{'invisible': [('supplier', '!=', True)]}" />
+					<field name="vat_eligible" attrs="{'invisible': [('customer', '=', True)]}"/>
+					<!-- <field name="vat" placeholder="e.g. BE0477472701"/> -->
+					<field name="vat_no" attrs="{'invisible': [('customer', '=', True)]}"/>
+					<field name="tax_no" attrs="{'invisible': [('customer', '=', True)]}"/>
+					<field name="rc" attrs="{'invisible': [('customer', '=', True)]}"/>
+					<field name="business_legal_structure" attrs="{'invisible': [('customer', '=', True)]}"/>
+					<field name="legal" attrs="{'invisible': [('customer', '=', True)]}"/>
+				</field>
+				<field name="function" position="before">
+					<field name="parent_account_number" readonly="0"/>
+					<field name="customer_type_id" readonly="0"/>
+					<!-- <field name="client_code" readonly="0"/> -->
+				</field>
+				<!-- <field name="customer" position="after">
+		    		<field name="potential_customer" invisible="1"/>
+				</field> lekan debug-->
+				<xpath expr="//notebook" position="inside">
+					<page string="Vendor Checklist" name="extra" attrs="{'invisible': [('supplier', '!=', True)]}">
+						<group string="REQUIRED DOCUMENTS"/>
+						<field name="completed_vendor_information"/>
+						<span>
+									COMPLETED VENDOR INFORMATION FORM (AS  ATTACHED)
+						</span>
+						<br/>
+						<br/>
+						<field name="report_of_proposers_follow_up"/>
+						<span>
+									REPORT OF PROPOSER'S FOLLOW UP REVIEW OF SECTIONS 4 and 5
+						</span>
+						<br/>
+						<br/>
+						<field name="true_copy_incorporation"/>
+						<span>
+									COPY OF CERTIFICATE OF INCORPORATION / BUSINESS NAME REGISTRATION CERTIFICATE
+						</span>
+						<br/>
+						<br/>
+						<field name="true_copy_memorandum"/>
+						<span>
+									CERTIFIED TRUE COPY OF MEMORANDUM AND ARTICLE OF  ASSOCIATION FOR LIMITED LIABILITY COMPANIES
+						</span>
+						<br/>
+						<br/>
+						<field name="true_copy_form_c02"/>
+						<span>
+									CERTIFIED TRUE COPY OF FORM C02 AND C07 FOR LIMITED LIABILITY COMPANIES
+						</span>
+						<br/>
+						<br/>
+						<field name="Vat_cert"/>
+						<span>
+									VAT CERTIFICATE / FIRS REGISTRATION CERTIFICATE
+						</span>
+						<br/>
+						<br/>
+						<field name="sign_and_stamp"/>
+						<span>
+									SIGN AND STAMP THE FOLLOWING SUNRAY VENRURES GENERAL TERMS and CONDITIONS BY AUTHORIZED STAFF 
+						</span>
+						<br/>
+						<br/>
+						<group string="DOCUMENTS ABOVE USD 10,000 CONTRACT"/>
+						<field name="current_dpr"/>
+						<span>
+									CURRENT DPR CERTIFICATE (If Applicable)
+						</span>
+						<br/>
+						<br/>
+						<field name="current_dpr"/>
+						<span>
+									COMMERCIAL PROPOSAL OR WEBSITE REVIEW (COMPANY PROFILE INCLUDING DETAILS OF MANAGEMENT TEAM, REFERENCES and CASE STUDIES)
+						</span>
+						<br/>
+						<br/>
+						<field name="proposers_report"/>
+						<span>
+									PROPOSER'S REPORT CONFIRMING CLEAN REVIEW ON INTERNET and OTHER AVAILABLE SOURCES (IF NOT CLEAN, FURTHER INFORMATION ON MATTERS IDENTIFIED)
+						</span>
+						<br/>
+						<br/>
+						<field name="copies_of_required_specialist"/>
+						<span>
+									COPIES OF REQUIRED SPECIALIST CERTIFICATIONS, REGISTRATIONS and LICENCES (If Applicable)
+						</span>
+						<br/>
+						<br/>
+						<group string="DOCUMENTS ABOVE USD 100,000 CONTRACT"/>
+						<field name="recommendation_letters_from_applicant"/>
+						<span>
+									RECOMMENDATION LETTER FROM APPLICANT BANKERS IN RESPECT TO THE OPERATION OF HIS/HER COMPANY'S ACCOUNT
+						</span>
+						<br/>
+						<br/>
+						<field name="evidence_of_tax"/>
+						<span>
+									EVIDENCE OF TAX PAYMENT
+						</span>
+						<br/>
+						<br/>
+						<field name="code_of_conduct"/>
+						<span>
+									CODE OF CONDUCT AND CODE OF ETHICS - SIGNED BY THE COMPANY'S MD OR AUTHORIZED STAFF
+						</span>
+						<br/>
+						<br/>
+						<field name="specific_references"/>
+						<span>
+									SPECIFIC REFERENCES
+						</span>
+						<br/>
+						<br/>
+						<field name="latest_financials"/>
+						<span>
+									LATEST FINANCIAL STATEMENTS / KEY KPIs
+						</span>
+						<br/>
+						<br/>
+					</page>
+					<page string="Customer Checklist" attrs="{'invisible': [('supplier', '=', True)]}">
+						<group string="REQUIRED DOCUMENTS"/>
+						<field name="completed_vendor_information"/>
+						<span>
+										COMPLETED CUSTOMER INFORMATION FORM (AS  ATTACHED)
+						</span>
+						<br/>
+						<br/>
+						<field name="report_of_proposers_follow_up"/>
+						<span>
+										REPORT OF PROPOSER'S FOLLOW UP REVIEW OF SECTIONS 4 and 5
+						</span>
+						<br/>
+						<br/>
+						<field name="true_copy_incorporation"/>
+						<span>
+										COPY OF CERTIFICATE OF INCORPORATION / BUSINESS NAME REGISTRATION CERTIFICATE
+						</span>
+						<br/>
+						<br/>
+						<field name="true_copy_memorandum"/>
+						<span>
+										CERTIFIED TRUE COPY OF MEMORANDUM AND ARTICLE OF  ASSOCIATION FOR LIMITED LIABILITY COMPANIES
+						</span>
+						<br/>
+						<br/>
+						<field name="true_copy_form_c02"/>
+						<span>
+										CERTIFIED TRUE COPY OF FORM C02 AND C07 FOR LIMITED LIABILITY COMPANIES
+						</span>
+						<br/>
+						<br/>
+						<field name="Vat_cert"/>
+						<span>
+										VAT CERTIFICATE / FIRS REGISTRATION CERTIFICATE
+						</span>
+						<br/>
+						<br/>
+
+						<group string="DOCUMENTS ABOVE USD 10,000 CONTRACT"/>
+						<field name="current_dpr"/>
+						<span>
+										CURRENT DPR CERTIFICATE (If Applicable)
+						</span>
+						<br/>
+						<br/>
+						<field name="commercial_certificate"/>
+						<span>
+										COMMERCIAL PROPOSAL OR WEBSITE REVIEW (COMPANY PROFILE INCLUDING DETAILS OF MANAGEMENT TEAM, REFERENCES and CASE STUDIES)
+						</span>
+						<br/>
+						<br/>
+						<field name="proposers_report"/>
+						<span>
+										PROPOSER'S REPORT CONFIRMING CLEAN REVIEW ON INTERNET and OTHER AVAILABLE SOURCES (IF NOT CLEAN, FURTHER INFORMATION ON MATTERS IDENTIFIED)
+						</span>
+						<br/>
+						<br/>
+
+						<group string="DOCUMENTS ABOVE USD 100,000 CONTRACT"/>
+						<field name="recommendation_letters_from_applicant"/>
+						<span>
+										RECOMMENDATION LETTER FROM APPLICANT BANKERS IN RESPECT TO THE OPERATION OF HIS/HER COMPANY'S ACCOUNT
+						</span>
+						<br/>
+						<br/>
+						<field name="evidence_of_tax"/>
+						<span>
+										EVIDENCE OF TAX PAYMENT
+						</span>
+						<br/>
+						<br/>
+						<field name="code_of_conduct"/>
+						<span>
+										CODE OF CONDUCT AND CODE OF ETHICS - SIGNED BY THE COMPANY'S MD OR AUTHORIZED STAFF
+						</span>
+						<br/>
+						<br/>
+						<field name="latest_financials"/>
+						<span>
+										LATEST FINANCIAL STATEMENTS / KEY KPIs
+						</span>
+						<br/>
+						<br/>
+					</page>
+				</xpath>
+			</field>
+		</record>
+
+		<!-- <record model="ir.actions.act_window" id="PotentialCustomer_action_window">
+        <field name="name">Potential Customer</field>
+        <field name="res_model">res.partner</field>
+        <field name="context">{"default_supplier": 0, "default_customer": 0, "default_potential_customer": 1}</field>
+        <field name="domain">[('potential_customer', '=', True)]</field>
+        <field name="view_mode">tree,form</field>
+        </record> lekan debug -->
+
+		<!-- <record model="ir.actions.act_window" id="crm_action_partner_form">
+        <field name="name">Customer</field>
+        <field name="res_model">res.partner</field>
+        <field name="context">{"default_supplier": 0, "default_customer": 0, "default_potential_customer": 1}</field>
+        <field name="domain">[('customer', '=', True)]</field>
+        <field name="view_mode">tree,form</field>
+        </record> Lekan debug -->
+
+		<!-- <record id="sunray_view_res_partner_filter" model="ir.ui.view">
+            <field name="name">sunray.res.partner.search.form</field>
+                <field name="model">res.partner</field>
+                <field name="inherit_id" ref="base.view_res_partner_filter"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//filter[@name='supplier']" position="after">
+                        <filter string="Potential Customer" name="potential_customer" domain="[('potential_customer','=',True)]"/>
+                    </xpath>
+                </field>
+        </record> lekan debug-->
+	</data>
+</odoo>

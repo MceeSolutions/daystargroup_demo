@@ -1,4 +1,18 @@
+from datetime import date
 from odoo import models, fields, api, _
+from odoo.addons import decimal_precision as dp
+
+
+PURCHASE_REQUISITION_STATES = [
+    ('draft', 'Draft'),
+    ('submit', 'Submitted'),
+    ('approve', 'Approved'),
+    ('ongoing', 'Ongoing'),
+    ('in_progress', 'Confirmed'),
+    ('open', 'Bid Selection'),
+    ('done', 'Closed'),
+    ('cancel', 'Cancelled')
+]
     
     
 class PurchaseOrder(models.Model):
@@ -10,8 +24,9 @@ class PurchaseOrder(models.Model):
         self.partner_ref = self.partner_id.ref
         
     @api.onchange('requisition_id')
-    def _onchange_partner_id(self):
-        self.employee_id = self.requisition_id.employee_id
+    def _onchange_requisition_id(self):
+        if self.requisition_id:
+            self.employee_id = self.requisition_id.employee_id
     
     @api.multi
     def _check_line_manager(self):
@@ -72,55 +87,58 @@ class PurchaseOrder(models.Model):
     employee_id = fields.Many2one('hr.employee', 'Employee',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, default=_default_employee)
     request_date = fields.Date(string='Request Date', readonly=True, track_visibility='onchange')
-    department_name = fields.Char(string="Employee Department", related="employee_id.department_id.name", readonly=True)    
-    
+    department_name = fields.Char(string="Employee Department", related="employee_id.department_id.name", readonly=True)
     approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
     manager_position = fields.Char('Manager Position', track_visibility='onchange')
-    
     second_manager_approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
     second_manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
     second_manager_position = fields.Char('2nd Manager Position', track_visibility='onchange')
-    
     finance_manager_approval_date = fields.Date(string='Finance Approval Date', readonly=True, track_visibility='onchange')
     finance_manager_approval = fields.Many2one('res.users','Finance Approval Name', readonly=True, track_visibility='onchange')
     finance_manager_position = fields.Char('Finance Personnel Position', track_visibility='onchange')    
-    
     po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
     po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
     po_manager_position = fields.Char('Manager Authorization Position', track_visibility='onchange')
-    
     line_manager_approval_date = fields.Date(string='Line-Manager Approval Date', readonly=True, track_visibility='onchange')
     line_manager_approval = fields.Many2one('res.users','Line-Manager Approval Name', readonly=True, track_visibility='onchange')
     parent_po = fields.Many2one('purchase.order','Parent PO', track_visibility='onchange')
     client_id = fields.Many2one('res.partner','Client', track_visibility='onchange')
-    
     project_id = fields.Many2one(comodel_name='project.project', string='Project')
-    
     inform_budget_owner = fields.Boolean ('Inform Budget Owner', track_visibility="onchange", copy=False)
     need_finance_review = fields.Boolean ('Finance Review', track_visibility="onchange", copy=False)
     need_finance_review_done = fields.Boolean ('Finance Review Done', track_visibility="onchange", copy=False)
     finance_review_done = fields.Boolean ('Finance Review Done', track_visibility="onchange", copy=False)
-    
-    need_management_approval = fields.Boolean(string="Management Approval")
-    need_first_management_approval = fields.Boolean(string="Management Approval 1")
-    need_second_management_approval = fields.Boolean(string="Management Approval 2")
-    
+    need_ceo_approval = fields.Boolean(string="Needs CEO Approval", compute="_compute_need_ceo_approval", default=False)
     state = fields.Selection([
         ('draft', 'RFQ'),
         ('sent', 'RFQ Sent'),
-        ('to approve', 'To Approve'),
-        ('submit', ' Line Manager Approval'),
-        ('management', 'Management Approval'),
-        ('legal', 'Awaiting Legal Review'),
-        ('legal_reviewed', 'Reviewed'),
+        ('submit', 'Manager To Approve'),
+        ('manager_approve', 'Procurement To Approve'),
+        ('procurement_approve', 'CFO To Approve'),
+        ('cfo_approve', 'COO To Approve'),
+        ('coo_approve', 'CEO To Approve'),
         ('purchase', 'Purchase Order'),
         ('done', 'Locked'),
         ('cancel', 'Cancelled')
-        ], string='Status', readonly=True, index=True, copy=False, default='draft', track_visibility='onchange')
+    ], string='Status', readonly=True, index=True, copy=False, default='draft', track_visibility='onchange')
     
     stock_source = fields.Char(string='Source document')
     store_request_id = fields.Many2one('stock.picking','Store Request', readonly=True, track_visibility='onchange')
+
+    @api.depends("currency_id", "amount_total")
+    def _compute_need_ceo_approval(self):
+        currency_id = self.currency_id
+        amount_total = self.amount_total
+        limit_in_naira = 100000
+        if self.currency_id == self.company_id.currency_id:
+            if amount_total > limit_in_naira:
+                self.need_ceo_approval = True
+                return True
+        limit_currency = currency_id.rate * limit_in_naira
+        if amount_total > limit_currency:
+            self.need_ceo_approval = True
+            return True
     
     @api.model
     def create(self, vals):
@@ -155,7 +173,7 @@ class PurchaseOrder(models.Model):
                     
     @api.multi
     def action_line_manager_approval(self):
-        self.write({'state':'to approve'})
+        self.write({'state':'manager_approve'})
         self.line_manager_approval_date = date.today()
         self.line_manager_approval = self._uid
         subject = "RFQ {} has been approved by Line Manager".format(self.name)
@@ -167,7 +185,7 @@ class PurchaseOrder(models.Model):
     
     @api.multi
     def action_procurement_approval(self):
-        self.write({'state':'management'})
+        self.write({'state':'procurement_approve'})
         self.po_approval_date = date.today()
         self.po_manager_approval = self._uid
         self.po_manager_position = self._check_manager_position()
@@ -178,6 +196,23 @@ class PurchaseOrder(models.Model):
             partner_ids.append(partner.id)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
+    @api.multi
+    def action_cfo_approval(self):
+        # Send to coo for approval
+        self.state = "cfo_approve"
+
+    @api.multi
+    def action_coo_approval(self):
+        state = 'purchase' if not self.need_ceo_approval else 'coo_approve'
+        self.write({
+            'state': state
+        })
+
+    @api.multi
+    def action_ceo_approval(self):
+        # Send to coo for approval
+        self.state = "purchase"
+
     @api.multi
     def notify_procurement_for_approval(self):
         group_id = self.env['ir.model.data'].xmlid_to_object('purchase.group_purchase_manager')
@@ -190,6 +225,7 @@ class PurchaseOrder(models.Model):
         subject = "RFQ {} needs approval from procurement".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
+<<<<<<< HEAD
     @api.depends('amount_total')
     def check_manager_approval_one(self):
         company_currency = self.company_id.currency_id
@@ -240,6 +276,8 @@ class PurchaseOrder(models.Model):
         subject = "RFQ {} needs your approval, Above Quota".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
+=======
+>>>>>>> lekan
     @api.multi
     def button_submit_legal(self):
         self.write({'state': 'legal'})
@@ -254,21 +292,21 @@ class PurchaseOrder(models.Model):
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return False
     
-    @api.multi
-    def button_finance_reviewd(self):
-        self.need_finance_review_done = True
-        self.finance_manager_approval_date = date.today()
-        self.finance_manager_approval = self._uid
-        self.finance_manager_position = self._check_manager_position()
-        subject = "Finance Review has been Done".format(self.name)
-        partner_ids = []
-        for partner in self.message_partner_ids:
-            partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        if self.amount_total < 100000.00:
-            self.check_manager_approval_one()
-        elif self.amount_total > 100000.00:
-            self.check_manager_approval_two()
+    # @api.multi
+    # def button_finance_reviewd(self):
+    #     self.need_finance_review_done = True
+    #     self.finance_manager_approval_date = date.today()
+    #     self.finance_manager_approval = self._uid
+    #     self.finance_manager_position = self._check_manager_position()
+    #     subject = "Finance Review has been Done".format(self.name)
+    #     partner_ids = []
+    #     for partner in self.message_partner_ids:
+    #         partner_ids.append(partner.id)
+    #     self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+    #     if self.amount_total < 100000.00:
+    #         self.check_manager_approval_one()
+    #     elif self.amount_total > 100000.00:
+    #         self.check_manager_approval_two()
     
     @api.multi
     def _check_budget(self):
@@ -308,54 +346,31 @@ class PurchaseOrder(models.Model):
         for order in self:
             if order.state not in ['draft','submit', 'sent', 'management']:
                 continue
-            #self._check_line_manager()
             self._check_line_manager()
-            #self._check_approval()
-            #self.button_submit_legal()
-            #if self._check_budget() == False and self.need_override:
-             #   return {}
             self.approval_date = date.today()
             self.manager_approval = self._uid
             order._add_supplier_to_product()
-            # Deal with double validation process
             if order.company_id.po_double_validation == 'one_step'\
                     or (order.company_id.po_double_validation == 'two_step'\
                         and order.amount_total < self.env.user.company_id.currency_id.compute(order.company_id.po_double_validation_amount, order.currency_id)):
-                    #or order.user_has_groups('purchase.group_purchase_manager'):
-                #order.button_approve()
                 print("don't confirm po even with po manager access")
-                order.write({'state': 'to approve'})
+                order.write({'state': 'manager_approve'})
             else:
-                order.write({'state': 'to approve'})
+                order.write({'state': 'manager_approve'})
         return True
-    
-    @api.multi
-    def action_first_manager_approval(self):
-        if self.need_first_management_approval == True: 
-            self.approval_date = date.today()
-            self.manager_approval = self._uid
-            self.manager_position = self._check_manager_position()
-            if self.need_second_management_approval == False:
-                self.button_approve()
-        subject = "RFQ {} has been approved".format(self.name)
-        partner_ids = []
-        for partner in self.message_partner_ids:
-            partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-        self.need_first_management_approval = False
         
-    @api.multi
-    def action_second_manager_approval(self):
-        if self.need_second_management_approval == True: 
-            self.second_manager_approval_date  = date.today()
-            self.second_manager_approval  = self._uid
-            self.second_manager_position = self._check_manager_position()
-            self.button_approve()
-        subject = "RFQ {} has been approved".format(self.name)
-        partner_ids = []
-        for partner in self.message_partner_ids:
-            partner_ids.append(partner.id)
-        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+    # @api.multi
+    # def action_second_manager_approval(self):
+    #     if self.need_second_management_approval == True: 
+    #         self.second_manager_approval_date  = date.today()
+    #         self.second_manager_approval  = self._uid
+    #         self.second_manager_position = self._check_manager_position()
+    #         self.button_approve()
+    #     subject = "RFQ {} has been approved".format(self.name)
+    #     partner_ids = []
+    #     for partner in self.message_partner_ids:
+    #         partner_ids.append(partner.id)
+    #     self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
     @api.multi
     def button_approve(self):
@@ -371,7 +386,6 @@ class PurchaseOrder(models.Model):
     
     @api.multi
     def button_request_finance_review(self):
-        #self.write({'state': 'approve'})
         self.need_finance_review = True
         group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_po_finance')
         user_ids = []
@@ -386,7 +400,6 @@ class PurchaseOrder(models.Model):
     
     @api.multi
     def button_inform_budget_owner(self):
-        #self.write({'state': 'approve'})
         self.inform_budget_owner = True
         group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_sale_account_budget')
         user_ids = []
@@ -407,16 +420,6 @@ class PurchaseOrder(models.Model):
         for partner in self.message_partner_ids:
             partner_ids.append(partner.id)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-    
-    #NOT TO BE USED YET AND DO NOT DELETE THIS 
-    """@api.multi
-    def button_approve(self):
-        super(PurchaseOrder, self).button_approve()
-        for order in self:
-            for order_line in order.order_line:
-                order_line.product_id.standard_price = order_line.price_unit
-    """
-
     
     @api.multi
     def button_reset(self):
@@ -459,3 +462,182 @@ class PurchaseOrderLine(models.Model):
             for partner in self.order_id.message_partner_ids:
                 partner_ids.append(partner.id)
             self.order_id.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+
+class PurchaseRequisition(models.Model):
+    _name = "purchase.requisition"
+    _description = "Procurement Request"
+    _inherit = ['purchase.requisition']
+    
+    @api.multi
+    def _check_line_manager(self):
+        current_employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        if current_employee == self.employee_id:
+            return True
+    
+    def _default_employee(self):
+        return self.env['hr.employee'].search([('user_id','=',self.env.uid)], limit=1)
+    
+    @api.depends('state')
+    def _set_state(self):
+        self.state_blanket_order = self.state
+    
+    state = fields.Selection(PURCHASE_REQUISITION_STATES,
+                              'Status', track_visibility='onchange', required=True,
+                              copy=False, default='draft')
+    state_blanket_order = fields.Selection(PURCHASE_REQUISITION_STATES, compute='_set_state')
+    store_request_id = fields.Many2one('stock.picking','Store Request', readonly=True, track_visibility='onchange')
+    employee_id = fields.Many2one('hr.employee', 'Employee',
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, default=_default_employee)
+    request_date = fields.Date(string='Request Date', readonly=True, track_visibility='onchange', default=date.today())
+    department_name = fields.Char(string="Employee Department", related="employee_id.department_id.name", readonly=True)
+    approval_date = fields.Date(string='Manager Approval Date', readonly=True, track_visibility='onchange')
+    manager_approval = fields.Many2one('res.users','Manager Approval Name', readonly=True, track_visibility='onchange')
+    manager_position = fields.Char('Manager Position', readonly=True, track_visibility='onchange')
+    po_approval_date = fields.Date(string='Authorization Date', readonly=True, track_visibility='onchange')
+    po_manager_approval = fields.Many2one('res.users','Manager Authorization Name', readonly=True, track_visibility='onchange')
+    po_manager_position = fields.Char('Manager Authorization Position', readonly=True, track_visibility='onchange')
+    submitted = fields.Boolean(string='Submitted')
+    line_manager_approval_date = fields.Date(string='Line-Manager Approval Date', readonly=True, track_visibility='onchange')
+    line_manager_approval = fields.Many2one('res.users','Line-Manager Approval Name', readonly=True, track_visibility='onchange')
+    total_cost = fields.Float(string='Total Cost', compute='_total_cost', track_visibility='onchange', readonly=True)
+    type_of_request = fields.Selection([
+        ('bid', 'Bid'),
+        ('contract', 'Contract'),
+        ('urgent', 'Urgent'),
+        ('single_source', 'Single Source')], string='Type of Request',
+        copy=False, default='bid', track_visibility='onchange')
+    justification = fields.Char('Justification', readonly=False, track_visibility='onchange')
+        
+    @api.multi
+    @api.depends('line_ids.price_subtotal')
+    def _total_cost(self):
+        for a in self:
+            for line in a.line_ids:
+                a.total_cost += line.price_subtotal
+    
+    @api.multi
+    def button_submit_purchase_agreement(self):
+        self.submitted = True
+        self.write({'state':'submit'})
+        user_ids = []
+        partner_ids = []
+        if self.employee_id.parent_id.user_id:
+            partner_ids.append(self.employee_id.parent_id.user_id.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "Procurement Request '{}' needs approval".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        return False
+    
+    @api.multi
+    def action_line_manager_approval(self):
+        self._check_line_manager()
+        self.write({'state':'approve'})
+        self.line_manager_approval_date = date.today()
+        self.line_manager_approval = self._uid
+        self.check_manager_approval_one()
+    
+    @api.multi
+    def action_in_progress(self):
+        res = super(PurchaseRequisition, self).action_in_progress()
+        self._check_line_manager()
+        self.approval_date = date.today()
+        self.manager_approval = self._uid
+        return res
+    
+    @api.multi
+    def action_open(self):
+        self.write({'state': 'open'})
+        self.po_approval_date = date.today()
+        self.po_manager_approval = self._uid
+        group_id = self.env['ir.model.data'].xmlid_to_object('purchase.group_purchase_manager')
+        user_ids = []
+        partner_ids = []
+        for user in group_id.users:
+            user_ids.append(user.id)
+            partner_ids.append(user.partner_id.id)
+        self.message_subscribe(partner_ids=partner_ids)
+        subject = "Purchase Agreement {} has been confirmed & approved".format(self.name)
+        self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+        return False
+    
+    @api.depends('total_price')
+    def check_manager_approval_one(self):
+        if self.total_cost < 18150000.00:
+            self.need_approval = True
+            group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_below_1st_authorization')
+            user_ids = []
+            partner_ids = []
+            for user in group_id.users:
+                user_ids.append(user.id)
+                partner_ids.append(user.partner_id.id)
+            self.message_subscribe(partner_ids=partner_ids)
+            subject = "Procurement Request {} needs your approval".format(self.name)
+            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+            return False
+        else:
+            self.need_approval = False
+            
+    @api.depends('total_price')
+    def check_manager_approval_two(self):
+        if self.total_cost > 18150000.00:
+            self.need_approval = True
+            group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_above_1st_authorization')
+            user_ids = []
+            partner_ids = []
+            for user in group_id.users:
+                user_ids.append(user.id)
+                partner_ids.append(user.partner_id.id)
+            self.message_subscribe(partner_ids=partner_ids)
+            subject = "Purchase Agreement {} needs your approval, Above Quota".format(self.name)
+            self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
+            return False
+        else:
+            self.need_approval = False
+    
+    
+class PurchaseRequisitionLine(models.Model):
+    _name = "purchase.requisition.line"
+    _inherit = ['purchase.requisition.line']
+    
+    @api.onchange('product_id')
+    def _onchange_partner_id(self):
+        self.description = self.product_id.display_name
+        self.price_unit = self.product_id.standard_price
+        return {}
+    
+    price_unit = fields.Float(string='Unit Price', digits=dp.get_precision('Product Price'))
+    project_id = fields.Many2one(comodel_name='project.project', string='Site Location')
+    product_id = fields.Many2one('product.product', string='Product', domain=[('purchase_ok', '=', True)], required=False)
+    description = fields.Char(string='Description', required=True)
+    price_subtotal = fields.Float(string="Price Subtotal", compute="_compute_subtotal", readonly=True)
+    account_analytic_id = fields.Many2one('account.analytic.account', string='Analytic Account', required=True)
+    
+    @api.one
+    @api.depends('product_qty', 'price_unit')
+    def _compute_subtotal(self):
+        for line in self:
+            self.price_subtotal = line.price_unit * self.product_qty
+    
+    @api.multi
+    def _prepare_purchase_order_line(self, name, product_qty=0.0, price_unit=0.0, taxes_ids=False):
+        self.ensure_one()
+        requisition = self.requisition_id
+        if requisition.schedule_date:
+            date_planned = datetime.datetime.combine(requisition.schedule_date, time.min)
+        else:
+            date_planned = datetime.datetime.now()
+        if not self.product_id:
+            raise UserError(_('Product(s) Must be created before becoming an RFQ'))
+        return {
+            'product_id': self.product_id.id,
+            'name': self.description,
+            'product_uom': self.product_id.uom_po_id.id,
+            'product_qty': product_qty,
+            'price_unit': price_unit,
+            'taxes_id': [(6, 0, taxes_ids)],
+            'date_planned': date_planned,
+            'account_analytic_id': self.account_analytic_id.id,
+            'analytic_tag_ids': self.analytic_tag_ids.ids,
+            'move_dest_ids': self.move_dest_id and [(4, self.move_dest_id.id)] or []
+        }
+    

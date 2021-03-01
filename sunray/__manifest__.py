@@ -1,41 +1,66 @@
 # -*- coding: utf-8 -*-
 {
     'name': "Sunray",
-
     'summary': """
         Sunray Modules""",
-
     'description': """
         Long description of module's purpose
     """,
-
     'author': "MCEE Solutions",
     'website': "http://www.mceesolutions.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
-    # for the full list
     'category': 'Sunray',
     'version': '0.132',
-    # any module necessary for this one to work correctly
-    'depends': ['base','hr','repair','website_form_editor', 'crm','sale','hr_expense','hr_holidays','project','purchase','helpdesk','stock','sale_subscription','product','account_budget','purchase_requisition','mrp','mrp_maintenance'],
-
-    # always loaded
+    'depends': [
+        'base',
+        'hr',
+        'hr_payroll',
+        'repair',
+        'website_form_editor', 
+        'crm',
+        'sale',
+        'hr_expense',
+        'hr_holidays',
+        'project',
+        'purchase',
+        'helpdesk',
+        'stock',
+        'product',
+        'account_budget',
+        'purchase_requisition',
+        'mrp',
+        'mrp_maintenance',
+        'sale_subscription',
+        'stock_barcode',
+    ],
     'data': [
         'security/sunray_security.xml',
         'security/ir.model.access.csv',
         'data/data.xml',
-        'views/views.xml',
+        'views/account_view.xml',
+        'views/availability_view.xml',
+        'views/brand_view.xml',
+        'views/contact_request_view.xml',
+        'views/crm_view.xml',
+        'views/expense_view.xml',
+        'views/helpdesk_view.xml',
+        'views/hr_view.xml',
+        'views/item_view.xml',
+        'views/maintenance_view.xml',
+        'views/mrp_view.xml',
+        'views/parking_view.xml',
+        'views/partner_view.xml',
+        'views/payment_view.xml',
+        'views/product_view.xml',
+        'views/project_view.xml',
+        'views/purchase_view.xml',
+        'views/repair_view.xml',
+        'views/sale_view.xml',
+        'views/site_code_view.xml',
         'views/stock_views.xml',
+        'views/sub_account_view.xml',
         'views/vendor_request_info_template.xml',
-        #'views/chatter.xml',
-        #'views/templates.xml',
+        'views/vendor_view.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        #'demo/demo.xml',
-    ],
-    
     'qweb': [
         'views/chatter.xml'
     ],
