@@ -19,6 +19,7 @@ class Picking(models.Model):
         type = self.env['stock.picking.type'].search([('code','=','outgoing')], limit=1)
         return type
     
+    '''
     @api.one
     @api.depends('site_code_id','site_code_id.project_id')
     def _get_analytic_account(self):
@@ -27,7 +28,7 @@ class Picking(models.Model):
     
     analytic_account_id = fields.Many2one(
         string='Analytic Account',
-        comodel_name='account.analytic.account', compute='_get_analytic_account', store=True 
+        comodel_name='account.analytic.account', store=True 
     )
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -48,6 +49,7 @@ class Picking(models.Model):
              " * Cancelled: has been cancelled, can't be confirmed anymore.")
     
     inventory_validation = fields.Boolean(string='inventory validation')
+    date_done = fields.Datetime('Effective Date', copy=False, readonly=True, help="Date at which the transfer has been processed or cancelled.")
     
     @api.multi
     def button_submit(self):
@@ -771,7 +773,7 @@ class MrpProduction(models.Model):
         
         return res
     
-    
+'''    
 class Repair(models.Model):
     _inherit = 'repair.order'
     
