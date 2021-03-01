@@ -15,7 +15,5 @@
                 </field>
             </field>
         </record>
-
-        <menuitem id="sunray_helpdesk_project_menu_main" action="sunray_helpdesk_view_project_action_window" sequence="15" parent="helpdesk.menu_helpdesk_root"/>
     </data>
 </odoo>

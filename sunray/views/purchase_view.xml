@@ -65,9 +65,6 @@
                 <xpath expr="//field[@name='line_ids']/tree/field[@name='product_id']" position="after">
                     <field name="description"/>
                 </xpath>
-                <!-- <xpath expr="//field[@name='line_ids']/tree/field[@name='price_unit']" position="after">
-            	<field name="price_subtotal"/>
-            </xpath> -->
                 <xpath expr="//button[@name='action_in_progress']" position="before">
                     <button name="button_submit_purchase_agreement" string="Submit To Manager" type="object" groups="base.group_user" attrs="{'invisible': ['|', ('submitted', '=', True), ('state', '!=', 'draft')]}"/>
                 </xpath>
@@ -226,17 +223,6 @@
                 </field>
             </field>
         </record>
-
-        <!-- <menuitem name="Sub Account" id="sub_account" parent="sale.sale_order_menu" action="SubAccount_action_window"/>
-    <menuitem name="Expense Form" id="expense_report_sunray_main_menu" parent="purchase.menu_purchase_config" action="expense_report_action"/>
-    <menuitem name="Parking List" id="parking_sunray_main_menu" parent="purchase.menu_purchase_config" action="parking_list_action"/>
-    <menuitem name="Payment Request Form" id="payment_sunray_main_menu" parent="purchase.menu_purchase_config" action="payment_request_action"/> -->
-
-
-        <menuitem name="Vendor Request" id="Vendor_request_menu" parent="purchase.menu_procurement_management" action="VendorRequest_action_window" sequence="100"/>
-
-        <menuitem name="Legal Approval(Vendor Request)" id="vendor_legal_approval_request_menu" parent="purchase.menu_procurement_management" action="sunray_vendor_legal_approval_action_window" sequence="100" groups="sunray.group_legal_team"/>
-
-        <menuitem name="Request Report" id="Vendor_requesters_report_menu" parent="purchase.menu_purchase_config" action="vendor_requesters_report_action" sequence="100"/>
+    
     </data>
 </odoo>

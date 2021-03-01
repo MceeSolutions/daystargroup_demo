@@ -23,14 +23,12 @@
             <field name="arch" type="xml">
                 <form string = "Business Expense Report">
                     <sheet>
-
                         <group col="4" colspan="2">
                             <field name="name"/>
                             <field name="purpose"/>
                             <field name="date_from"/>
                             <field name="date_to"/>
                         </group>
-
                         <notebook>
                             <page string = "Business Expense Form">
                                 <field name="line_ids" colspan="4">

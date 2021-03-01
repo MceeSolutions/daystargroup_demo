@@ -1,12 +1,5 @@
 <odoo>
-	<data>
-		<record model="ir.actions.act_window" id="availability_demand_action_window">
-			<field name="name">Avalability Demand Form</field>
-			<field name="res_model">availability.request</field>
-			<field name="context">{}</field>
-			<field name="domain">[]</field>
-			<field name="view_mode">tree,form</field>
-		</record>
+	<data>		
 
 		<record id="sunray_availability_demand_form" model="ir.ui.view">
 			<field name="name">availability.request.form</field>
@@ -48,5 +41,14 @@
 				</form>
 			</field>
 		</record>
+
+		<record model="ir.actions.act_window" id="availability_demand_action_window">
+			<field name="name">Avalability Demand Form</field>
+			<field name="res_model">availability.request</field>
+			<field name="context">{}</field>
+			<field name="domain">[]</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
 	</data>
 </odoo>

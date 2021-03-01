@@ -71,7 +71,6 @@
 							<field name="project_id"/>
 							<field name="site_area" required="1"/>
 							<field name="num" invisible="1"/>
-							<!-- <field name="active"/>  -->
 							<label for="site_address" string="Site Address"/>
 							<div class="o_address_format">
 								<field name="address_number" placeholder="Number" class="o_address_street"/>
@@ -111,5 +110,5 @@
 			<field name="context">{}</field>
 		</record>
 
-		<data>
-		</odoo>
+	</data>
+</odoo>

@@ -11,8 +11,6 @@
             </field>
         </record>
 
-
-
         <record model="ir.ui.view" id="item_type_form_view">
             <field name="name">item type</field>
             <field name="model">item.type</field>

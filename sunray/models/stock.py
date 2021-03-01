@@ -643,7 +643,6 @@ class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
     analytic_account_id = fields.Many2one(
-<<<<<<< HEAD
         related='move_id.analytic_account_id')
 
 class MrpBom(models.Model):
@@ -967,6 +966,3 @@ class HrPayslip(models.Model):
 
              
     
-=======
-        related='move_id.analytic_account_id')
->>>>>>> demo
