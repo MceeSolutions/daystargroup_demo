@@ -225,7 +225,6 @@ class PurchaseOrder(models.Model):
         subject = "RFQ {} needs approval from procurement".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
-<<<<<<< HEAD
     @api.depends('amount_total')
     def check_manager_approval_one(self):
         company_currency = self.company_id.currency_id
@@ -276,8 +275,6 @@ class PurchaseOrder(models.Model):
         subject = "RFQ {} needs your approval, Above Quota".format(self.name)
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
-=======
->>>>>>> lekan
     @api.multi
     def button_submit_legal(self):
         self.write({'state': 'legal'})

@@ -38,14 +38,10 @@ class MrpProduction(models.Model):
     def _default_partner(self):
         return self.project_id.partner_id.id
     
-    project_id = fields.Many2one(comodel_name='project.project', string='Projects')
-    
+    project_id = fields.Many2one(comodel_name='project.project', string='Projects')    
     partner_id = fields.Many2one(comodel_name='res.partner', string='Customer', readonly=False, default=_default_partner)
-    
     total_cost = fields.Float(string='Total Cost', compute='_total_cost', track_visibility='onchange', readonly=True)
-    
     project_budget = fields.Float(string='Project Budget', related='project_id.project_budget', track_visibility='onchange', readonly=True)
-    
     approved_mo = fields.Boolean ('Approved MO', track_visibility="onchange", readonly=True)
     
     @api.model
@@ -83,23 +79,15 @@ class MrpProduction(models.Model):
         for a in self:
             for line in a.move_raw_ids:
                 a.total_cost += line.price_cost * line.product_uom_qty
-                
     
     @api.multi
     def create_store_request(self):
         """
         Method to open create purchase order form
-        """
-
-        #partner_id = self.request_client_id
-        #client_id = self.request_client_id
-        #sub_account_id = self.sub_account_id
-        #product_id = self.move_lines.product_id
-             
+        """  
         view_ref = self.env['ir.model.data'].get_object_reference('sunray', 'sunray_stock_form_view')
         view_id = view_ref[1] if view_ref else False
         
-        #purchase_line_obj = self.env['purchase.order.line']
         for subscription in self:
             order_lines = []
             for line in subscription.move_raw_ids:
@@ -123,7 +111,5 @@ class MrpProduction(models.Model):
             'view_id': view_id,
             'target': 'current',
             'context': {'default_origin': self.name, "default_is_locked":False, "default_picking_type_id":self.env.ref("sunray.stock_picking_type_emp").id, 'default_move_lines': order_lines}
-        }
-        
+        }    
         return res
-    
