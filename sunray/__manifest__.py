@@ -9,7 +9,7 @@
     'author': "MCEE Solutions",
     'website': "http://www.mceesolutions.com",
     'category': 'Sunray',
-    'version': '0.132',
+    'version': '0.133',
     'depends': [
         'base',
         'hr',
@@ -28,8 +28,6 @@
         'account_budget',
         'purchase_requisition',
         'mrp',
-        # 'mrp_maintenance',
-        # 'sale_subscription',
         'stock_barcode',
     ],
     'data': [
@@ -45,7 +43,6 @@
         'views/helpdesk_view.xml',
         'views/hr_view.xml',
         'views/item_view.xml',
-        # 'views/maintenance_view.xml',
         'views/mrp_view.xml',
         'views/parking_view.xml',
         'views/partner_view.xml',
@@ -53,7 +50,6 @@
         'views/product_view.xml',
         'views/project_view.xml',
         'views/purchase_view.xml',
-        # 'views/repair_view.xml',
         'views/sale_view.xml',
         'views/site_code_view.xml',
         'views/stock_views.xml',
