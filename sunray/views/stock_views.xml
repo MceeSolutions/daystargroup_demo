@@ -162,7 +162,7 @@
 						<group>
 							<group>
 								<field name="is_locked" invisible="1"/>
-								<!-- <field name="employee_id" required="1" groups="stock.group_stock_manager"/> -->
+								<field name="employee_id" required="1" groups="stock.group_stock_manager"/>
 								<field name="partner_id" attrs="{'invisible': [('picking_type_code', '=', 'internal')]}" required="1"/>
 								<field name="location_id" groups="stock.group_stock_user" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"/>
 								<field name="location_dest_id" groups="stock.group_stock_user" invisible="1"/>

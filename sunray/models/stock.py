@@ -14,6 +14,8 @@ from odoo.addons import decimal_precision as dp
 class Picking(models.Model):
     _name = "stock.picking"
     _inherit = 'stock.picking'
+
+    employee_id = fields.Many2one('hr.employee', "Responsible")
     
     def _default_picking_type_id(self): 
         type = self.env['stock.picking.type'].search([('code','=','outgoing')], limit=1)
