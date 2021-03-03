@@ -54,49 +54,6 @@
 				<xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='quantity_done']" position="after">
 					<field name="price_unit" attrs="{'invisible': [('picking_type_id', '!=', 1)]}"/>
 				</xpath>
-				<!-- <field name="move_ids_without_package" position="after">
-					<group class="oe_subtotal_footer oe_right">
-						<field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-					</group>
-				</field> -->
-				<!-- <xpath expr="//notebook" position="inside">
-					<page string="Logistics" attrs="{'invisible': [('picking_type_id', '!=', 21)]}">
-						<group string="General Info" col="4" colspan="2">
-							<field name="order_no"/>
-							<field name="ship_status"/>
-							<field name="bu"/>
-							<field name="type_of_cargo"/>
-							<field name="supplier"/>
-							<field name="pfi_no_bl"/>
-							<field name="incoterms"/>
-							<field name="incoterms_location"/>
-							<field name="country_of_supplier_id"/>
-							<field name="logistics_provider"/>
-						</group>
-						<group string="Shipping" col="4" colspan="2">
-							<field name="mode_of_transport"/>
-							<field name="date_of_equipment"/>
-							<field name="target_shipment_date"/>
-							<field name="actual_shipment_date"/>
-							<field name="eta"/>
-							<field name="ata"/>
-							<field name="arrival_at_warehouse"/>
-						</group>
-						<group string="Form M" col="4" colspan="2">
-							<field name="pfi"/>
-							<field name="product_certificate"/>
-							<field name="insurance"/>
-							<field name="form_m"/>
-						</group>
-						<group string="PAAR" col="4" colspan="2">
-							<field name="bill_of_landing"/>
-							<field name="ccvo"/>
-							<field name="packing_list"/>
-							<field name="soncap"/>
-							<field name="paar"/>
-						</group>
-					</page>
-				</xpath> -->
 			</field>
 		</record>
 
@@ -123,7 +80,6 @@
 					<header>
 						<field name="id" invisible="1"/>
 						<field name="show_mark_as_todo" invisible="1"/>
-						<!-- <field name="man_confirm" invisible="1"/> -->
 						<field name="show_check_availability" invisible="1"/>
 						<field name="show_validate" invisible="1"/>
 						<field name="show_lots_text" invisible="1"/>
@@ -167,7 +123,6 @@
 								<field name="location_id" groups="stock.group_stock_user" attrs="{'invisible': [('picking_type_code', '=', 'outgoing')]}"/>
 								<field name="location_dest_id" groups="stock.group_stock_user" invisible="1"/>
 								<field name="backorder_id" readonly="1" attrs="{'invisible': [('backorder_id','=',False)]}"/>
-								<!-- <field name="analytic_account_id" groups="sunray.group_hr_line_manager"/> -->
 							</group>
 							<group>
 								<field name="scheduled_date" attrs="{'readonly': [('id', '=', False)], 'required': [('id', '!=', False)]}"/>
@@ -233,12 +188,6 @@
 									</tree>
 								</field>
 								<button class="oe_highlight" name="put_in_pack" type="object" string="Put in Pack" attrs="{'invisible': [('state', 'in', ('done', 'cancel'))]}" groups="stock.group_tracking_lot"/>
-								<!-- <group class="oe_subtotal_footer oe_right" colspan="2" name="total">
-									<div class="oe_subtotal_footer_separator oe_inline o_td_label">
-										<label for="total_price"/>
-									</div>
-									<field name="total_price" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-								</group> -->
 							</page>
 							<page string="Additional Info" name="extra" groups="stock.group_stock_user">
 								<group>
@@ -246,9 +195,6 @@
 										<field name="picking_type_code" />
 										<field name="move_type" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/>
 										<field name="picking_type_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-										<!-- <field name="picking_type_id_name" invisible="1"/> -->
-										<!-- <field name="picking_type_id_code" invisible="1"/> -->
-										<!-- <field name="project_id" readonly="1"/> -->
 									</group>
 									<group>
 										<field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
@@ -277,10 +223,7 @@
 
 		<menuitem name="Manufacturer" id="brand_list" parent="stock.menu_product_in_config_stock" action="brands_action_window"/>
 		<menuitem name="Item Types" id="equipment_list" parent="stock.menu_product_in_config_stock" action="item_action_window"/>
-
-
 		<menuitem name="Availability Demand Form" id="availability_demand_menu" parent="stock.menu_stock_root" action="availability_demand_action_window"/>
-
 		<menuitem name="Store Request" id="store_request" parent="stock.menu_stock_root" action="store_req_action_window"/>
 
 	</data>

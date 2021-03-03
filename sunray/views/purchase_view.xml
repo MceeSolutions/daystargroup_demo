@@ -140,9 +140,7 @@
                 <xpath expr="//header" position="inside">
                     <field name= "need_override" attrs="{'invisible': [('need_override', '=', False)]}" />
                     <button name="button_submit" string="Submit to Manager" type="object" states="draft" groups="base.group_user"/>
-                    <button name="button_inform_budget_owner" string="Inform Budget Owner" type="object" attrs="{'invisible': ['|', ('state', '=', 'purchase'), ('inform_budget_owner', '=', True)]}" groups="base.group_user"/>
                     <button name="button_finance_reviewd" string="Finance Review Done" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|', ('state', '=', 'purchase'), ('need_finance_review', '=', False), ('need_finance_review_done', '=', True)]}" groups="sunray.group_po_finance"/>
-                    <button name="button_legal_reviewd" type="object" states='legal' string="Reviewed" class="oe_highlight" groups="sunray.group_legal_team"/>
                     <button name="button_cancel" type="object" states='to approve,legal_reviewed' string="Cancel Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
                     <button name="action_line_manager_approval" type="object" states="submit" string="Approve" id="draft_confirm" groups="sunray.group_hr_line_manager"/>
                     <button name="action_procurement_approval" type="object" states='manager_approve' string="Approve Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
@@ -202,11 +200,11 @@
                         <field name="finance_manager_approval"/>
                         <field name="finance_manager_approval_date"/>
                     </group>
-                    <group string = "First Authorization" col="4" colspan="4">
+                    <group string = "COO Authorization" col="4" colspan="4">
                         <field name="manager_approval"/>
                         <field name="approval_date"/>
                     </group>
-                    <group string = "Second Authorization" col="4" colspan="4">
+                    <group string = "CEO Authorization" col="4" colspan="4">
                         <field name="second_manager_approval"/>
                         <field name="second_manager_approval_date"/>
                     </group>

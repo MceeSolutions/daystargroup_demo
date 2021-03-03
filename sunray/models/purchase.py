@@ -161,7 +161,6 @@ class PurchaseOrder(models.Model):
     def button_submit(self):
         self.write({'state': 'submit'})
         self.request_date = date.today()
-        # group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_hr_line_manager') # This is redundant
         user_ids = []
         partner_ids = []
         if self.employee_id.parent_id.user_id:
@@ -229,7 +228,6 @@ class PurchaseOrder(models.Model):
     def check_manager_approval_one(self):
         company_currency = self.company_id.currency_id
         current_currency = self.currency_id
-        # self.need_management_approval = 
         if self.amount_total < 100000.00:
             self.need_first_management_approval = True
             group_id = self.env['ir.model.data'].xmlid_to_object('sunray.group_below_1st_authorization')
@@ -289,22 +287,6 @@ class PurchaseOrder(models.Model):
         self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
         return False
     
-    # @api.multi
-    # def button_finance_reviewd(self):
-    #     self.need_finance_review_done = True
-    #     self.finance_manager_approval_date = date.today()
-    #     self.finance_manager_approval = self._uid
-    #     self.finance_manager_position = self._check_manager_position()
-    #     subject = "Finance Review has been Done".format(self.name)
-    #     partner_ids = []
-    #     for partner in self.message_partner_ids:
-    #         partner_ids.append(partner.id)
-    #     self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
-    #     if self.amount_total < 100000.00:
-    #         self.check_manager_approval_one()
-    #     elif self.amount_total > 100000.00:
-    #         self.check_manager_approval_two()
-    
     @api.multi
     def _check_budget(self):
         override = False
@@ -355,19 +337,6 @@ class PurchaseOrder(models.Model):
             else:
                 order.write({'state': 'manager_approve'})
         return True
-        
-    # @api.multi
-    # def action_second_manager_approval(self):
-    #     if self.need_second_management_approval == True: 
-    #         self.second_manager_approval_date  = date.today()
-    #         self.second_manager_approval  = self._uid
-    #         self.second_manager_position = self._check_manager_position()
-    #         self.button_approve()
-    #     subject = "RFQ {} has been approved".format(self.name)
-    #     partner_ids = []
-    #     for partner in self.message_partner_ids:
-    #         partner_ids.append(partner.id)
-    #     self.message_post(subject=subject,body=subject,partner_ids=partner_ids)
     
     @api.multi
     def button_approve(self):

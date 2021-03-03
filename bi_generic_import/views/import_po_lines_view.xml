@@ -41,7 +41,8 @@
 					<button name="%(import_po_line_action)d" 
 					string="Import Purchase Order Lines"
                     type="action" 
-                    class="btn-primary"/>
+                    class="btn-primary"
+                    groups="base.group_no_one"/>
 				</header>
 			</field>
 		</record>
