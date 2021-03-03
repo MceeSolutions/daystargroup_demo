@@ -9,7 +9,7 @@
     'author': "MCEE Solutions",
     'website': "http://www.mceesolutions.com",
     'category': 'Sunray',
-    'version': '0.135',
+    'version': '0.136',
     'depends': [
         'base',
         'hr',
