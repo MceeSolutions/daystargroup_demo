@@ -11,7 +11,7 @@ from . import hr
 from . import ir_sequence
 from . import item
 from . import mail
-from . import maintenance
+# from . import maintenance
 from . import mrp
 from . import parking
 from . import partner
@@ -20,7 +20,7 @@ from . import pension
 from . import product
 from . import project
 from . import purchase
-from . import repair
+# from . import repair
 from . import res_company
 from . import res_config_settings
 from . import res_country

@@ -6,7 +6,7 @@
                         <field name="inherit_id" ref="repair.view_repair_order_form"/>
                         <field name="arch" type="xml">
                                 <xpath expr="//field[@name='operations']/tree/field[@name='product_id']" position="after">
-                                        <!-- <field name="site_code_id" required = "0" domain="[('partner_id','=', parent.partner_id)]"/> -->
+                                        <field name="site_code_id" required = "0" domain="[('partner_id','=', parent.partner_id)]"/>
                                 </xpath>
                                 <xpath expr="//button[@name='action_repair_cancel']" position="after">
                                         <button name="create_store_request" states="confirmed" string="Store Request" type="object"/>

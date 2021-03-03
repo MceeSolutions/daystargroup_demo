@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
-        <record id="bi_import_invoice_inherit_form" model="ir.ui.view">
+        <!-- <record id="bi_import_invoice_inherit_form" model="ir.ui.view">
             <field name="name">bi.import.invoice.inherit.form</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
@@ -12,7 +12,7 @@
                 </field>
 
             </field>
-        </record>
+        </record> -->
         <record id="gen_inv_wizard_view_form" model="ir.ui.view">
             <field name="name">wizard for import invoice file </field>
             <field name="model">gen.invoice</field>

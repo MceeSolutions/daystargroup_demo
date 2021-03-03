@@ -154,14 +154,14 @@ class SaleOrderLine(models.Model):
         self.write({'project_id': project.id})
         return project
 
-class SaleSubscription(models.Model):
-    _inherit = "sale.subscription"
+# class SaleSubscription(models.Model):
+#     _inherit = "sale.subscription"
     
-    sale_order_id = fields.Many2one(comodel_name='sale.order', string='Sale Order')
+#     sale_order_id = fields.Many2one(comodel_name='sale.order', string='Sale Order')
 
-class SaleSubscriptionLine(models.Model):
-    _inherit = "sale.subscription.line"
+# class SaleSubscriptionLine(models.Model):
+#     _inherit = "sale.subscription.line"
     
-    site_code_id = fields.Many2one(comodel_name="site.code", string="Site Code")
-    account_analytic_id = fields.Many2one(comodel_name='account.analytic.account', string="Analytic Account", copy=False)
+#     site_code_id = fields.Many2one(comodel_name="site.code", string="Site Code")
+#     account_analytic_id = fields.Many2one(comodel_name='account.analytic.account', string="Analytic Account", copy=False)
     
