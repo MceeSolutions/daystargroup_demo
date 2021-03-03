@@ -12,7 +12,7 @@ from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 
 class Picking(models.Model):
-    _name = "stock.picking"
+    # _name = "stock.picking"
     _inherit = 'stock.picking'
 
     employee_id = fields.Many2one('hr.employee', "Responsible")

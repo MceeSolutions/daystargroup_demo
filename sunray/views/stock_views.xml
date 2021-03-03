@@ -62,7 +62,7 @@
 			<field name="res_model">stock.picking</field>
 			<field name="view_mode">tree,form</field>
 			<field name="context" eval='{"default_is_locked":False}'/>
-		</record>quire
+		</record>
      
 		<record id="store_req_action_tree" model="ir.actions.act_window.view">
 			<field eval="1" name="sequence"/>
@@ -225,6 +225,22 @@
 		<menuitem name="Item Types" id="equipment_list" parent="stock.menu_product_in_config_stock" action="item_action_window"/>
 		<menuitem name="Availability Demand Form" id="availability_demand_menu" parent="stock.menu_stock_root" action="availability_demand_action_window"/>
 		<menuitem name="Store Request" id="store_request" parent="stock.menu_stock_root" action="store_req_action_window"/>
+
+		<record id="stock.menu_stock_inventory_control" model="ir.ui.menu">
+			<field name="name">Master Data</field>
+			<field name="groups_id" eval="[(4, ref('stock.group_stock_manager'))]" />
+		</record>
+
+		<record id="store_request_rule" model="ir.rule">
+			<field name="name">Store Request</field>
+			<field name="perm_read">1</field>
+			<field name="perm_write">1</field>
+			<field name="perm_create">1</field>
+			<field name="perm_unlink">1</field>
+			<field name="model_id" ref="stock.model_stock_picking" />
+			<field name="domain_force">['|', ('employee_id', '=', False), ('employee_id.user_id.id', '=', user.id)]</field>
+			<field name="groups" eval="[(4, ref('base.group_user'))]" />
+		</record>
 
 	</data>
 </odoo>
