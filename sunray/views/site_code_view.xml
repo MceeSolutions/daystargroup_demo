@@ -95,12 +95,6 @@
 			<field name="target">new</field>
 		</record>
 
-		<!-- <record model="ir.actions.act_window" id="site_location_action_window">
-      		<field name="name">Site Code</field>
-      		<field name="res_model">site.code</field>
-      		<field name="view_mode">tree,form</field>
-    	</record>-->
-
 		<record model="ir.actions.act_window" id="site_location_action_window">
 			<field name="name">Site Code</field>
 			<field name="res_model">site.code</field>
@@ -109,6 +103,8 @@
 			<field name="domain">[]</field>
 			<field name="context">{}</field>
 		</record>
+
+		<menuitem id="site_code_crm_menu" name="Site Code" groups="sunray.group_ict,sunray.group_site_code_creation" parent="crm.crm_menu_root" sequence="3" action="sunray.site_location_action_window" />
 
 	</data>
 </odoo>

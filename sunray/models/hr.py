@@ -79,6 +79,7 @@ class Employee(models.Model):
                                 return True
         return
 
+
 class Department(models.Model):
     _inherit = "hr.department"
     
@@ -101,7 +102,8 @@ class Department(models.Model):
         }
         department = self.env['account.analytic.account'].create(values)
         return department
-    
+
+   
 class Job(models.Model):
 
     _name = "hr.job"
@@ -356,6 +358,7 @@ class EmployeeContract(models.Model):
                                 return True
         return
 
+
 class HrPayslipRun(models.Model):
     _inherit = 'hr.payslip.run'
     
@@ -363,6 +366,7 @@ class HrPayslipRun(models.Model):
     def close_payslip_run(self):
         self.slip_ids.action_payslip_done()
         return self.write({'state': 'close'})
+
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
@@ -379,10 +383,8 @@ class HrPayslip(models.Model):
             credit_sum = 0.0
             date = slip.date or slip.date_to
             currency = slip.company_id.currency_id
-
             name = _('Payslip of %s') % (slip.employee_id.name)
             move_dict = {
-                #'narration': name,
                 'ref': slip.number,
                 'journal_id': slip.journal_id.id,
                 'date': date,
@@ -456,7 +458,6 @@ class HrPayslip(models.Model):
             move_dict['line_ids'] = line_ids
             move = self.env['account.move'].create(move_dict)
             slip.write({'move_id': move.id, 'date': date})
-            #move.post()
         return self.write({'state': 'done'})
 
 
@@ -466,7 +467,8 @@ class HrExpense(models.Model):
     
     
     analytic_account_id = fields.Many2one('account.analytic.account', string='Analytic Account', states={'post': [('readonly', True)], 'done': [('readonly', True)]}, oldname='analytic_account', required=True)
-    
+
+
 class HrExpenseSheet(models.Model):
     _name = "hr.expense.sheet"
     _inherit = 'hr.expense.sheet'
