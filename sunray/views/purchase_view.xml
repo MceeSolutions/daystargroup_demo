@@ -144,9 +144,9 @@
                     <button name="button_cancel" type="object" states='to approve,legal_reviewed' string="Cancel Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
                     <button name="action_line_manager_approval" type="object" states="submit" string="Approve" id="draft_confirm" groups="sunray.group_hr_line_manager"/>
                     <button name="action_procurement_approval" type="object" states='manager_approve' string="Approve Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
-                    <button name="action_cfo_approval" type="object" states="procurement_approve" string="Confirm Order" class="oe_highlight" groups=""/>
-                    <button name="action_coo_approval" type="object" states="cfo_approve" string="Confirm Order" class="oe_highlight" groups=""/>
-                    <button name="action_ceo_approval" type="object" states="coo_approve" string="Confirm Order" class="oe_highlight" groups=""/>
+                    <button name="action_cfo_approval" type="object" states="procurement_approve" string="Confirm Order" class="oe_highlight" groups="sunray.cfo_group"/>
+                    <button name="action_coo_approval" type="object" states="cfo_approve" string="Confirm Order" class="oe_highlight" groups="sunray.coo_group"/>
+                    <button name="action_ceo_approval" type="object" states="coo_approve" string="Confirm Order" class="oe_highlight" groups="sunray.ceo_group"/>
                     <button name="button_cancel" type="object" states='purchase' string="Cancel Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
                     <button name="button_reset" type="object" states='purchase' string="Reset To Draft" groups="purchase.group_purchase_manager"/>
                     <button name="button_cancel" type="object" states="submit" string="Decline" id="draft_decline" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>

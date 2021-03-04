@@ -1,133 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<data>
+    <data>
 
-	<record id="group_hr_line_manager" model="res.groups">
-        <field name="name">Line Manager</field>
-        <field name="category_id" ref="base.module_category_human_resources"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_hr_manager" model="res.groups">
-        <field name="name">HR Manager</field>
-        <field name="category_id" ref="base.module_category_human_resources"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_sale_account_budget" model="res.groups">
-        <field name="name">Budget Officer</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_one_vendor_approval" model="res.groups">
-        <field name="name">1st Vendor Approval</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_customer_approval" model="res.groups">
-        <field name="name">Customer Approval</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_ict" model="res.groups">
-        <field name="name">ICT</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_two_vendor_approval" model="res.groups">
-        <field name="name">2nd Vendor Approval</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_legal_team" model="res.groups">
-        <field name="name">Legal Team</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-     <record id="group_head_projects" model="res.groups">
-        <field name="name">Head of Projects</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_invoice_approval_projects" model="res.groups">
-        <field name="name">Invoice Approval</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_vendor_bill_validation" model="res.groups">
-        <field name="name">Vendor Bill Validation</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_customer_validation" model="res.groups">
-        <field name="name">Customer Validation</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_petty_cash_request" model="res.groups">
-        <field name="name">Petty Cash Request</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_payment_registration" model="res.groups">
-        <field name="name">Payment Registration</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_below_1st_authorization" model="res.groups">
-        <field name="name">PO 1st Authorization</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_below_2nd_authorization" model="res.groups">
-        <field name="name">2nd Authorization(Below)</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_above_1st_authorization" model="res.groups">
-        <field name="name">PO 2nd Authorization</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_above_2nd_authorization" model="res.groups">
-        <field name="name">2nd Authorization(Above)</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_sensitive_data" model="res.groups">
-        <field name="name">Sensitve Data</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_md" model="res.groups">
-        <field name="name">MD</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_noc_team" model="res.groups">
-        <field name="name">Noc Team</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_site_code_creation" model="res.groups">
-        <field name="name">Site Code Creation</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_potential_customer_creation" model="res.groups">
-        <field name="name">potential Customer Creation</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_chairman" model="res.groups">
-        <field name="name">Chairman</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-    <record id="group_po_finance" model="res.groups">
-        <field name="name">PO Finance Group</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    
-</data>
+        <record id="management_category" model="ir.module.category">
+            <field name="name">Management Staff</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="ceo_group" model="res.groups">
+            <field name="name">CEO</field>
+            <field name="category_id" ref="management_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="coo_group" model="res.groups">
+            <field name="name">COO</field>
+            <field name="category_id" ref="management_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="cfo_group" model="res.groups">
+            <field name="name">CFO</field>
+            <field name="category_id" ref="management_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="group_hr_line_manager" model="res.groups">
+            <field name="name">Line Manager</field>
+            <field name="category_id" ref="base.module_category_human_resources"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_hr_manager" model="res.groups">
+            <field name="name">HR Manager</field>
+            <field name="category_id" ref="base.module_category_human_resources"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_sale_account_budget" model="res.groups">
+            <field name="name">Budget Officer</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_one_vendor_approval" model="res.groups">
+            <field name="name">1st Vendor Approval</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_customer_approval" model="res.groups">
+            <field name="name">Customer Approval</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_ict" model="res.groups">
+            <field name="name">ICT</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_two_vendor_approval" model="res.groups">
+            <field name="name">2nd Vendor Approval</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_legal_team" model="res.groups">
+            <field name="name">Legal Team</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_head_projects" model="res.groups">
+            <field name="name">Head of Projects</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_invoice_approval_projects" model="res.groups">
+            <field name="name">Invoice Approval</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_vendor_bill_validation" model="res.groups">
+            <field name="name">Vendor Bill Validation</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_customer_validation" model="res.groups">
+            <field name="name">Customer Validation</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_petty_cash_request" model="res.groups">
+            <field name="name">Petty Cash Request</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_payment_registration" model="res.groups">
+            <field name="name">Payment Registration</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_below_1st_authorization" model="res.groups">
+            <field name="name">PO 1st Authorization</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_below_2nd_authorization" model="res.groups">
+            <field name="name">2nd Authorization(Below)</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_above_1st_authorization" model="res.groups">
+            <field name="name">PO 2nd Authorization</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_above_2nd_authorization" model="res.groups">
+            <field name="name">2nd Authorization(Above)</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_sensitive_data" model="res.groups">
+            <field name="name">Sensitve Data</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_md" model="res.groups">
+            <field name="name">MD</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_noc_team" model="res.groups">
+            <field name="name">Noc Team</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_site_code_creation" model="res.groups">
+            <field name="name">Site Code Creation</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_potential_customer_creation" model="res.groups">
+            <field name="name">potential Customer Creation</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_chairman" model="res.groups">
+            <field name="name">Chairman</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <record id="group_po_finance" model="res.groups">
+            <field name="name">PO Finance Group</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+    </data>
 </odoo>

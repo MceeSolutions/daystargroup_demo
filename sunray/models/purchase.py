@@ -198,10 +198,14 @@ class PurchaseOrder(models.Model):
     @api.multi
     def action_cfo_approval(self):
         # Send to coo for approval
+        self.finance_manager_approval_date = date.today()
+        self.finance_manager_approval = self._uid
         self.state = "cfo_approve"
 
     @api.multi
     def action_coo_approval(self):
+        self.second_manager_approval_date = date.today()
+        self.second_manager_approval = self._uid
         state = 'purchase' if not self.need_ceo_approval else 'coo_approve'
         self.write({
             'state': state
