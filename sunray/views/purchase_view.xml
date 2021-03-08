@@ -140,13 +140,12 @@
                 <xpath expr="//header" position="inside">
                     <field name= "need_override" attrs="{'invisible': [('need_override', '=', False)]}" />
                     <button name="button_submit" string="Submit to Manager" type="object" states="draft" groups="base.group_user"/>
-                    <button name="button_finance_reviewd" string="Finance Review Done" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|', ('state', '=', 'purchase'), ('need_finance_review', '=', False), ('need_finance_review_done', '=', True)]}" groups="sunray.group_po_finance"/>
                     <button name="button_cancel" type="object" states='to approve,legal_reviewed' string="Cancel Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
                     <button name="action_line_manager_approval" type="object" states="submit" string="Approve" id="draft_confirm" groups="sunray.group_hr_line_manager"/>
                     <button name="action_procurement_approval" type="object" states='manager_approve' string="Approve Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
-                    <button name="action_cfo_approval" type="object" states="procurement_approve" string="Confirm Order" class="oe_highlight" groups="sunray.cfo_group"/>
-                    <button name="action_coo_approval" type="object" states="cfo_approve" string="Confirm Order" class="oe_highlight" groups="sunray.coo_group"/>
-                    <button name="action_ceo_approval" type="object" states="coo_approve" string="Confirm Order" class="oe_highlight" groups="sunray.ceo_group"/>
+                    <button name="action_cfo_approval" type="object" states="procurement_approve" string="Finance Review Done" class="oe_highlight" groups="sunray.cfo_group"/>
+                    <button name="action_coo_approval" type="object" states="cfo_approve" string="COO Approve" class="oe_highlight" groups="sunray.coo_group"/>
+                    <button name="action_ceo_approval" type="object" states="coo_approve" string="CEO Approve" class="oe_highlight" groups="sunray.ceo_group"/>
                     <button name="button_cancel" type="object" states='purchase' string="Cancel Order" class="oe_highlight" groups="purchase.group_purchase_manager"/>
                     <button name="button_reset" type="object" states='purchase' string="Reset To Draft" groups="purchase.group_purchase_manager"/>
                     <button name="button_cancel" type="object" states="submit" string="Decline" id="draft_decline" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>
@@ -162,11 +161,11 @@
                     <button name="button_confirm" type="object" string="Approve Order" id="draft_confirm" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager" invisible="1"/>
                 </xpath>
                 <xpath expr="//button[@name='button_cancel']" position="replace">
-                    <button name="button_cancel" type="object" states="management" string="Decline Order" id="draft_decline" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>
+                    <button name="button_cancel" type="object" states="procurement_approve,cfo_approve,coo_approve" string="Decline Order" id="draft_decline" groups="sunray.group_hr_line_manager,purchase.group_purchase_manager"/>
                 </xpath>
                 <xpath expr="//button[@name='button_approve']" position="replace">
                     <button name="button_approve" type="object" string="Confirm Order" class="oe_highlight" groups="purchase.group_purchase_manager" invisible="1"/>
-                    <button name="button_approve_without_authorization" type="object" string="Confirm Order" attrs="{'invisible': [ ('state', 'in', ('purchase','done'))]}" class="oe_highlight" groups="base.group_no_one" invisible="0"/>
+                    <button name="button_approve_without_authorization" type="object" string="Confirm Order" attrs="{'invisible': [ ('state', 'in', ('purchase','done'))]}" class="oe_highlight" groups="base.group_no_one" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='currency_id']" position="after">
                     <field name= "need_ceo_approval" invisible="1" />
