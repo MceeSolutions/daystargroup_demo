@@ -204,8 +204,8 @@ class PurchaseOrder(models.Model):
 
     @api.multi
     def action_coo_approval(self):
-        self.second_manager_approval_date = date.today()
-        self.second_manager_approval = self._uid
+        self.approval_date = date.today()
+        self.manager_approval = self._uid
         state = 'purchase' if not self.need_ceo_approval else 'coo_approve'
         self.write({
             'state': state
@@ -215,6 +215,8 @@ class PurchaseOrder(models.Model):
     def action_ceo_approval(self):
         # Send to coo for approval
         self.button_approve()
+        self.second_manager_approval_date = date.today()
+        self.second_manager_approval = self._uid
         self.state = "purchase"
 
     @api.multi
