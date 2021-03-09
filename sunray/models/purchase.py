@@ -214,6 +214,7 @@ class PurchaseOrder(models.Model):
     @api.multi
     def action_ceo_approval(self):
         # Send to coo for approval
+        self.button_approve()
         self.state = "purchase"
 
     @api.multi
