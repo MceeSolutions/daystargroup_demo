@@ -25,6 +25,7 @@
         'helpdesk',
         'stock',
         'product',
+        'account',
         'account_budget',
         'purchase_requisition',
         'mrp',
@@ -56,6 +57,7 @@
         'views/sub_account_view.xml',
         'views/vendor_request_info_template.xml',
         'views/vendor_view.xml',
+        'report/report_invoice_with_payment.xml',
     ],
     'qweb': [
         'views/chatter.xml'

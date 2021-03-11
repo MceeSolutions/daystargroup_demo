@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <delete id="sale_stock.report_invoice_document_inherit_sale_stock" model="ir.ui.view" />
+
+        <template id="sunray_report_invoice_document" inherit_id="account.report_invoice_document">
+            <xpath expr="/t/t/t[2]" position="replace" />
+            <xpath expr="/t/t/div[hasclass('page')]/h2" position="replace" />
+
+            <!-- Remove from the invoice labels -->
+            <xpath expr="/t/t/div[hasclass('page')]/div[@id='informations']" position="replace" />
+            <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/thead/tr/th[2]" position="replace" />
+            <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/thead/tr/th[3]" position="replace" />
+            <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/thead/tr/th[4]" position="replace">
+                <th t-if="o.type_of_invoice == 'additional_hours'">Rate/min</th>
+            </xpath>
+
+            <!-- Remove the invoice lines -->
+            <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/tbody/t/tr/t/td[2]" position="replace" />
+            <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/tbody/t/tr/t/td[3]" position="replace" />
+            <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/tbody/t/tr/t/td[4]" position="replace">
+                <td t-if="o.type_of_invoice == 'additional_hours'">Rate comes in here...</td>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>
