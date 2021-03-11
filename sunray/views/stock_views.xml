@@ -57,6 +57,28 @@
 			</field>
 		</record>
 
+		<record id="sunray_vpicktree" model="ir.ui.view">
+			<field name="name">sunray.vpicktree</field>
+			<field name="model">stock.picking</field>
+			<field name="inherit_id" ref="stock.vpicktree" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='date_done']" position="after">
+					<field name="site_code_id" />
+				</xpath>
+			</field>
+		</record>
+
+		<record id="view_picking_form_sunray" model="ir.ui.view">
+			<field name="name">view.picking.form.sunray</field>
+			<field name="model">stock.picking</field>
+			<field name="inherit_id" ref="stock.view_picking_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='location_id']" position="after">
+					<field name="site_code_id" />
+				</xpath>
+			</field>
+		</record>
+
 		<record model="ir.actions.act_window" id="store_req_action_window">
 			<field name="name">Store Request</field>
 			<field name="res_model">stock.picking</field>
