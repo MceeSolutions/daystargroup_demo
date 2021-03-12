@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="sunray_external_layout_standard" inherit_id="web.external_layout_standard">
+            <xpath expr="//div[hasclass('header')]" position="replace" />
+            <xpath expr="//div[hasclass('o_standard_footer')]/div/ul" position="replace" />
+            <xpath expr="//div[@name='financial_infos']" position="replace" />
+        </template>
+    </data>
+</odoo>

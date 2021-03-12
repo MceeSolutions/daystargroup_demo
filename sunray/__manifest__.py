@@ -12,6 +12,7 @@
     'version': '0.136',
     'depends': [
         'base',
+        'web',
         'hr',
         'hr_payroll',
         'repair',
@@ -58,6 +59,7 @@
         'views/vendor_request_info_template.xml',
         'views/vendor_view.xml',
         'report/report_invoice_with_payment.xml',
+        'report/web_layout_standard.xml',
     ],
     'qweb': [
         'views/chatter.xml'
