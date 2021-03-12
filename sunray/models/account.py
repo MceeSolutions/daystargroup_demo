@@ -1,10 +1,12 @@
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class AccountMove(models.Model):
     _name = "account.move"
     _inherit = ['account.move', 'mail.thread', 'mail.activity.mixin']
-    
+
+
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
     

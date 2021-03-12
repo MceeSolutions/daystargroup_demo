@@ -14,54 +14,60 @@
             <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/thead/tr/th[4]" position="replace">
                 <th t-if="o.type_of_invoice == 'additional_hours'">Rate/min</th>
             </xpath>
+            <xpath expr="//th[@name='th_price_unit']" position="replace" />
+                
 
             <!-- Remove the invoice lines -->
             <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/tbody/t/tr/t/td[2]" position="replace" />
             <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/tbody/t/tr/t/td[3]" position="replace" />
             <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']/tbody/t/tr/t/td[4]" position="replace">
-                <td t-if="o.type_of_invoice == 'additional_hours'">Rate comes in here...</td>
+                <td t-if="o.type_of_invoice == 'additional_hours'"><t t-esc="line.rate_min" /></td>
             </xpath>
-
             <xpath expr="//t/t/div[hasclass('page')]/div[hasclass('clearfix')]" position="replace">
                 <div class="clearfix">
-                        <div id="total" class="row">
-                            <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
-                                <table class="table table-sm" style="page-break-inside: avoid;">
-                                    <tr class="border-black o_subtotal" style="">
-                                        <td><strong>Subtotal</strong></td>
-                                        <td class="text-right">
-                                            <span t-field="o.amount_untaxed"/>
-                                        </td>
+                    <div id="total" class="row">
+                        <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
+                            <table class="table table-sm" style="page-break-inside: avoid;">
+                                <tr class="border-black o_subtotal" style="">
+                                    <td><strong>Subtotal</strong></td>
+                                    <td class="text-right">
+                                        <span t-field="o.amount_untaxed"/>
+                                    </td>
+                                </tr>
+                                <t t-foreach="o.amount_by_group" t-as="amount_by_group">
+                                    <tr style="">
+                                        <t t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
+                                            <td><span t-esc="amount_by_group[0]"/></td>
+                                            <td class="text-right o_price_total">
+                                                <span t-esc="amount_by_group[3]"/>
+                                            </td>
+                                        </t>
+                                        <t t-else="">
+                                            <td>
+                                                <span t-esc="amount_by_group[0]"/>
+                                            </td>
+                                            <td class="text-right o_price_total">
+                                                <span t-esc="amount_by_group[3]"/>
+                                            </td>
+                                        </t>
                                     </tr>
-                                    <t t-foreach="o.amount_by_group" t-as="amount_by_group">
-                                        <tr style="">
-                                            <t t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
-                                                <td><span t-esc="amount_by_group[0]"/></td>
-                                                <td class="text-right o_price_total">
-                                                    <span t-esc="amount_by_group[3]"/>
-                                                </td>
-                                            </t>
-                                            <t t-else="">
-                                                <td>
-                                                    <span t-esc="amount_by_group[0]"/>
-                                                </td>
-                                                <td class="text-right o_price_total">
-                                                    <span t-esc="amount_by_group[3]"/>
-                                                </td>
-                                            </t>
-                                        </tr>
-                                    </t>
-                                    <tr class="border-black o_total">
-                                        <td><strong>Total</strong></td>
-                                        <td class="text-right">
-                                            <span t-field="o.amount_total"/>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
+                                </t>
+                                <tr class="border-black o_total">
+                                    <td><strong>Total</strong></td>
+                                    <td class="text-right">
+                                        <span t-field="o.amount_total"/>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
+                </div>
             </xpath>
+            <xpath expr="//t/t/div[hasclass('page')]/p[1]" position="replace">
+                <p t-if="o.name">
+                    Please use the following communication for your payment : <b><span t-field="o.name"/></b>
+                </p>
+            </xpath> 
             <xpath expr="//t/t/div[hasclass('page')]/div[@id='qrcode']" position="after">
                 <div class="row">
                     <div class="col-6" style="border:1px solid black;">
@@ -82,30 +88,45 @@
                 </div>
             </xpath>
             <xpath expr="/t/t/div[hasclass('page')]/table[@name='invoice_line_table']" position="before">
-                <div class="col-12">
-                    <div class="col-6" />
-                    <div class="col-6">
-                        <div>Daybreak Power Solutions Limited</div>
-                        <div>RC1394859</div>
-                        <div>1 Adeyemi Bero Crescent,</div>
-                        <div>Ilupeju Industrial Estate, Ilupeju,</div>
-                        <div>Lagos, Nigeria</div>
-                        <div>TIN: 20306493-0001</div>
-                        <div>https://www.daystar-power.com/</div>
-                    </div>
-                </div>
-                <div class="col-12 oe_left">
-                    <div>Customer:</div>
-                    <div>Unity Bank Plc.</div>
-                    <div>42, Ahmed Onibudo Victoria Island, Lagos,</div>
-                    <div>Nigeria</div>
-                    <div>RC 94524</div>
-                </div>
-                <div class="col-12 oe_right">
-                    <div><strong>Invoice No. 20210208-UNT-ADD-0105</strong></div>
-                    <span>Invoice Date:<br/>31/01/2021</span>
-                    <span>Due Date:<br/>03/03/2021</span>
-                </div>
+                <table class="table">
+                    <tr class="text-right">    
+                        <td style="border:none;">
+                            <h4 style="color: #80e5ff;" t-esc="o.company_id.name" /><br/>
+                            <h5 t-esc="o.company_id.partner_id.rc" />
+                            <span t-esc="o.company_id.street" />,<br/>
+                            <span t-esc="o.company_id.street2" />,<br/>
+                            <span t-esc="o.company_id.city" />, <span t-esc="o.company_id.country_id.name" /><br/>
+                            TIN: <span t-if="o.company_id.vat" t-esc="o.company_id.vat" /><br/>
+                            <span t-esc="o.company_id.website" /><br/>
+                        </td>
+                    </tr>
+                </table>
+                <table class="table">
+                    <tr class="text-left">
+                        <td style="border:none;">
+                            <span><strong class="text-right">Customer:</strong></span><br/>
+                            <span t-esc="o.partner_id.name" /><br/>
+                            <span t-esc="o.partner_id.street" />, <span t-esc="o.partner_id.city" />, <span t-esc="o.partner_id.state_id.name" /><br/>
+                            <span t-esc="o.partner_id.country_id.name" /><br/>
+                            <span t-esc="o.partner_id.x_studio_rc_number" /><br/>
+                        </td>
+                    </tr>
+                </table>
+                <table class="table">
+                    <tr class="text-right">
+                        <td style="border:none;">
+                            <h3 class="text-right">Invoice No. <t t-esc="o.name" /></h3><br/>
+                            <div>
+                                <span><strong>Invoice Date:</strong></span>
+                                <span><strong>Due Date:</strong></span>
+                            </div>
+                            <div>
+                                <span t-esc="o.date_invoice" />
+                                <span t-esc='o.date_due' />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </xpath>
         </template>
     </data>
